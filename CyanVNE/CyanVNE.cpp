@@ -1,7 +1,4 @@
-﻿// CyanVNE.cpp: 定义应用程序的入口点。
-//
-
-#include "CyanVNE.h"
+﻿#include "CyanVNE.h"
 
 using namespace std;
 
