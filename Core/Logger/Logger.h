@@ -4,7 +4,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/android_sink.h>
-#include <CoreException/CoreException.h>
+#include <Core/CoreException/CoreException.h>
 #include <memory>
 #include <chrono>
 #include <format>

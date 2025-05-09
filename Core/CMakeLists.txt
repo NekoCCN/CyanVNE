@@ -1,10 +1,8 @@
 ﻿
-include_directories( "./" )
-
 set(CyanVNECore_SRC
   "Logger/Logger.h"
   "Logger/Logger.cpp"
- "CoreException/CoreException.h" "SpscQueue/SpscQueue.h" "Stream/Stream.h" "TSVector/TSVector.h")
+ "CoreException/CoreException.h" "SpscQueue/SpscQueue.h" "Stream/Stream.h" "TSVector/TSVector.h" "Serialization/Serialization.h")
 
 add_library(CyanVNECore STATIC ${CyanVNECore_SRC})
 
