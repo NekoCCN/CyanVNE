@@ -61,7 +61,7 @@ namespace cyanvne
 				StreamInterface(StreamInterface&&) = delete;
 				StreamInterface& operator=(StreamInterface&&) = delete;
 
-                virtual ~StreamInterface() = default;
+                ~StreamInterface() override = default;
 			};
 		}
 	}

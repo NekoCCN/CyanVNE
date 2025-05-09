@@ -24,6 +24,24 @@ namespace cyanvne
             CyanVNERuntimeException(const std::string& message) : std::runtime_error(message)
             {  }
         };
+        class IllegalArgumentException : public CyanVNELogicException
+        {
+        public:
+            IllegalArgumentException(const std::string& message) : CyanVNELogicException(message)
+            {  }
+        };
+        class NullPointerException : public CyanVNELogicException
+        {
+        public:
+            NullPointerException(const std::string& message) : CyanVNELogicException(message)
+            {  }
+        };
+        class MemoryAllocException : public CyanVNERuntimeException
+        {
+        public:
+            MemoryAllocException(const std::string& message) : CyanVNERuntimeException(message)
+            {  }
+        };
 
         namespace coreexception
         {
