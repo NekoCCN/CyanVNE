@@ -1,11 +1,7 @@
 #pragma once
 #include <vector>
-#include <memory>
 #include <mutex>
 #include <cstdint>
-#include <cstring>
-#include <algorithm>
-#include <Core/CoreException/CoreException.h>
 #include <Core/Stream/Stream.h>
 
 namespace cyanvne

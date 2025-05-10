@@ -1,4 +1,6 @@
 #include "Logger.h"
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
 void cyanvne::core::GlobalLogger::initUniversalCoreLogger(const LoggerConfig& config)
 {

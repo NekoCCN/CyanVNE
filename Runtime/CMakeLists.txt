@@ -3,8 +3,8 @@ set(CyanVNERuntime_SRC
   "GuiContext/GuiContext.h"
   "GuiContext/GuiContext.cpp"
   "WMContext/WMContext.h"
-  "WMContext/WMContext.cpp"
-)
+  
+ "WindowContext/WindowContext.h" "WindowContext/WindowContext.cpp" "RuntimeException/RuntimeException.h" "BasicRender/BasicRender.h")
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 

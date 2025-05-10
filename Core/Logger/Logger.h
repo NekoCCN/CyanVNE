@@ -1,13 +1,10 @@
 #pragma once
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/android_sink.h>
 #include <Core/CoreException/CoreException.h>
 #include <memory>
 #include <chrono>
-#include <format>
 #include <mutex>
 
 namespace cyanvne
@@ -37,6 +34,10 @@ namespace cyanvne
             };
 
             GlobalLogger() = delete;
+            GlobalLogger(const GlobalLogger&) = delete;
+            GlobalLogger(GlobalLogger&&) = delete;
+            GlobalLogger& operator=(const GlobalLogger&) = delete;
+            GlobalLogger& operator=(GlobalLogger&&) = delete;
             ~GlobalLogger() = delete;
 
             static void initUniversalCoreLogger(const LoggerConfig& config);
@@ -44,10 +45,18 @@ namespace cyanvne
 
             static const std::shared_ptr<spdlog::logger>& getCoreLogger()
             {
-                return _core_logger;
+                if (!_core_logger)
+                {
+                    throw exception::coreexception::LogSystemNotInitException("Core logger not initialized");
+                }
+                    return _core_logger;
             }
             static const std::shared_ptr<spdlog::logger>& getClientLogger()
             {
+                if (!_client_logger)
+                {
+                    throw exception::coreexception::LogSystemNotInitException("Client logger not initialized");
+                }
                 return _client_logger;
             }
         };

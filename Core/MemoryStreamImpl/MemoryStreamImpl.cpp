@@ -1,4 +1,8 @@
 #include "MemoryStreamImpl.h"
+#include <cstring>
+#include <algorithm>
+#include <Core/CoreException/CoreException.h>
+#include <memory>
 
 cyanvne::core::stream::DynamicMemoryStreamImpl::DynamicMemoryStreamImpl(const void* initial_data, size_t initial_size) : position_(0)
 {

@@ -1,0 +1,27 @@
+#pragma once
+#include <Core/CoreException/CoreException.h>
+#include <exception>
+#include <stdexcept>
+
+namespace cyanvne
+{
+    namespace exception
+    {
+        namespace runtimeexception
+        {
+            class CreateWindowContextException : public CyanVNERuntimeException
+            {
+            public:
+                CreateWindowContextException(const std::string& message) : CyanVNERuntimeException(message)
+                {  }
+            };
+
+            class InitWMSystemException : public CyanVNERuntimeException
+            {
+            public:
+                InitWMSystemException(const std::string& message) : CyanVNERuntimeException(message)
+                {  }
+            };
+        }
+    }
+}
