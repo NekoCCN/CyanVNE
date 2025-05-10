@@ -43,6 +43,10 @@ include_directories ( "External/pre_soloud/soloud/include" )
 add_subdirectory( "External/spdlog" )
 include_directories( "External/spdlog/include" )
 
+# YAML-cpp
+add_subdirectory( "External/yaml-cpp" )
+include_directories( "External/yaml-cpp/include" )
+
 # CyanVNE SRC
 include_directories( "./" )
 add_subdirectory ("CyanVNE")

@@ -16,3 +16,6 @@
 [submodule "External/spdlog"]
 	path = External/spdlog
 	url = https://github.com/NekoCCN/spdlog.git
+[submodule "External/yaml-cpp"]
+	path = External/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
