@@ -4,7 +4,7 @@
 #include <thread>
 #include <chrono>
 
-namespace vn
+namespace cyanvne
 {
     namespace core
     {

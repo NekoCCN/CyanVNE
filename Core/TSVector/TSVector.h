@@ -8,7 +8,7 @@
 #include <shared_mutex>
 #include <algorithm>
 
-namespace vn
+namespace cyanvne
 {
     namespace core
     {

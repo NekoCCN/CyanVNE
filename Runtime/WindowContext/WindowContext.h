@@ -140,7 +140,7 @@ namespace cyanvne
 					SDL_SetWindowFullscreen(window_, false);
 				}
 			}
-			void setWindowSize(uint32_t width, uint32_t height) const
+			void setWindowSize(int32_t width, int32_t height) const
 			{
 				SDL_SetWindowSize(window_, width, height);
 			}

@@ -1,6 +1,6 @@
 #pragma once
-#include <memory>
 #include <SDL3/SDL.h>
+#include <Runtime/WindowContext/WindowContext.h>
 
 namespace cyanvne
 {
@@ -18,7 +18,7 @@ namespace cyanvne
 				RenderableInterface(const RenderableInterface& other) = delete;
 				RenderableInterface& operator=(const RenderableInterface& other) = delete;
 
-				virtual void render() = 0;
+				virtual void render(const std::shared_ptr<WindowContext>& window_context) = 0;
 
 				virtual ~RenderableInterface() = default;
 			};
@@ -99,7 +99,7 @@ namespace cyanvne
 				ResponsiveInterface(const ResponsiveInterface& other) = delete;
 				ResponsiveInterface& operator=(const ResponsiveInterface& other) = delete;
 
-				virtual void response(SDL_Event* event) = 0;
+				virtual void response(const SDL_Event* event) = 0;
 
 				// MouseEvent
 				enum class MouseEvent : uint8_t
@@ -108,53 +108,8 @@ namespace cyanvne
 					MOUSE_BUTTON_DOWN,
 					MOUSE_BUTTON_UP
 				};
-				static bool universalMouseEventListen(SDL_Event* event, MouseEvent event_type, const SDL_FRect& rect)
-				{
-					if (event_type == MouseEvent::MOUSE_BUTTON_DOWN)
-					{
-						if (event->type != SDL_EVENT_MOUSE_BUTTON_DOWN)
-						{
-							return false;
-						}
-					}
-					else if (event_type == MouseEvent::MOUSE_BUTTON_UP)
-					{
-						if (event->type != SDL_EVENT_MOUSE_BUTTON_UP)
-						{
-							return false;
-						}
-					}
-					else if (event_type == MouseEvent::MOUSE_MOTION)
-					{
-						if (event->type != SDL_EVENT_MOUSE_MOTION)
-						{
-							return false;
-						}
-					}
-
-					float x, y;
-					SDL_GetMouseState(&x, &y);
-
-
-					if (x < rect.x)
-					{
-						return false;
-					}
-					else if (x > rect.x + rect.w)
-					{
-						return false;
-					}
-					else if (y < rect.y)
-					{
-						return false;
-					}
-					else if (y > rect.y + rect.h)
-					{
-						return false;
-					}
-
-					return true;
-				}
+				static bool universalMouseEventListen(const SDL_Event* event,
+					MouseEvent event_type, const SDL_FRect& rect);
 
 				virtual ~ResponsiveInterface() = default;
 			};

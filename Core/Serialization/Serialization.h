@@ -2,6 +2,10 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <list>
 #include <type_traits>
 #include <cstddef>
 #include <Core/Stream/Stream.h>
@@ -50,6 +54,38 @@ namespace cyanvne
             template <typename T>
             constexpr bool is_std_map_v = is_std_map<std::decay_t<T>>::value;
 
+            template <typename T> struct is_std_set : std::false_type
+            {  };
+            template <typename Key, typename Comp, typename Alloc>
+            struct is_std_set<std::set<Key, Comp, Alloc>> : std::true_type
+            {  };
+            template <typename T>
+            constexpr bool is_std_set_v = is_std_set<std::decay_t<T>>::value;
+
+            template <typename T> struct is_std_unordered_map : std::false_type
+            {  };
+            template <typename Key, typename Value, typename Hash, typename KeyEqual, typename Alloc>
+            struct is_std_unordered_map<std::unordered_map<Key, Value, Hash, KeyEqual, Alloc>> : std::true_type
+            {  };
+            template <typename T>
+            constexpr bool is_std_unordered_map_v = is_std_unordered_map<std::decay_t<T>>::value;
+
+            template <typename T> struct is_std_unordered_set : std::false_type
+            {  };
+            template <typename Key, typename Hash, typename KeyEqual, typename Alloc>
+            struct is_std_unordered_set<std::unordered_set<Key, Hash, KeyEqual, Alloc>> : std::true_type
+            {  };
+            template <typename T>
+            constexpr bool is_std_unordered_set_v = is_std_unordered_set<std::decay_t<T>>::value;
+
+            template <typename T> struct is_std_list : std::false_type
+            {  };
+            template <typename Elem, typename Alloc>
+            struct is_std_list<std::list<Elem, Alloc>> : std::true_type
+            {  };
+            template <typename T>
+            constexpr bool is_std_list_v = is_std_list<std::decay_t<T>>::value;
+
 
             template <typename T>
             bool serialize_object(cyanvne::core::stream::OutStreamInterface& out, const T& value)
@@ -80,7 +116,7 @@ namespace cyanvne
                     }
                     return true;
                 }
-                else if constexpr (is_std_vector_v<StrippedT>)
+                else if constexpr (is_std_vector_v<StrippedT> || is_std_list_v<StrippedT>)
                 {
                     size_t size = value.size();
                     if (!out.write(&size, sizeof(size)))
@@ -96,7 +132,7 @@ namespace cyanvne
                     }
                     return true;
                 }
-                else if constexpr (is_std_map_v<StrippedT>)
+                else if constexpr (is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT>)
                 {
                     size_t size = value.size();
                     if (!out.write(&size, sizeof(size)))
@@ -116,15 +152,35 @@ namespace cyanvne
                     }
                     return true;
                 }
+                else if constexpr (is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>) // 合并 set 和 unordered_set
+                {
+                    size_t size = value.size();
+                    if (!out.write(&size, sizeof(size)))
+                    {
+                        return false;
+                    }
+                    for (const auto& item : value)
+                    {
+                        if (!serialize_object(out, item))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
                 else
                 {
                     static_assert(std::is_base_of_v<BinarySerialiable, StrippedT> ||
                         std::is_fundamental_v<StrippedT> ||
                         std::is_same_v<StrippedT, std::string> ||
                         is_std_vector_v<StrippedT> ||
-                        is_std_map_v<StrippedT>,
+                        is_std_list_v<StrippedT> ||
+                        is_std_map_v<StrippedT> ||
+                        is_std_set_v<StrippedT> ||
+                        is_std_unordered_map_v<StrippedT> ||
+                        is_std_unordered_set_v<StrippedT>,
                         "BinarySerializer: Unsupported type for serialize_object. "
-                        "Type must be fundamental, std::string, std::vector, std::map, "
+                        "Type must be fundamental, std::string, std::vector, std::list, std::map, std::set, std::unordered_map, std::unordered_set, "
                         "or implement the BinarySerialiable interface.");
                     return false;
                 }
@@ -167,7 +223,6 @@ namespace cyanvne
                     {
                         return false;
                     }
-
                     value.clear();
                     value.resize(size);
                     for (size_t i = 0; i < size; ++i)
@@ -179,21 +234,37 @@ namespace cyanvne
                     }
                     return true;
                 }
-                else if constexpr (is_std_map_v<StrippedT>)
+                else if constexpr (is_std_list_v<StrippedT>)
                 {
                     size_t size;
                     if (!in.read(&size, sizeof(size)))
                     {
                         return false;
                     }
-
                     value.clear();
-
+                    for (size_t i = 0; i < size; ++i)
+                    {
+                        typename StrippedT::value_type temp_item;
+                        if (!deserialize_object(in, temp_item))
+                        {
+                            return false;
+                        }
+                        value.push_back(std::move(temp_item));
+                    }
+                    return true;
+                }
+                else if constexpr (is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT>)
+                {
+                    size_t size;
+                    if (!in.read(&size, sizeof(size)))
+                    {
+                        return false;
+                    }
+                    value.clear();
                     for (size_t i = 0; i < size; ++i)
                     {
                         typename StrippedT::key_type k;
                         typename StrippedT::mapped_type v;
-
                         if (!deserialize_object(in, k))
                         {
                             return false;
@@ -206,15 +277,38 @@ namespace cyanvne
                     }
                     return true;
                 }
+                else if constexpr (is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>) // 合并 set 和 unordered_set
+                {
+                    size_t size;
+                    if (!in.read(&size, sizeof(size)))
+                    {
+                        return false;
+                    }
+                    value.clear();
+                    for (size_t i = 0; i < size; ++i)
+                    {
+                        typename StrippedT::key_type k;
+                        if (!deserialize_object(in, k))
+                        {
+                            return false;
+                        }
+                        value.emplace(std::move(k));
+                    }
+                    return true;
+                }
                 else
                 {
                     static_assert(std::is_base_of_v<BinarySerialiable, StrippedT> ||
                         std::is_fundamental_v<StrippedT> ||
                         std::is_same_v<StrippedT, std::string> ||
                         is_std_vector_v<StrippedT> ||
-                        is_std_map_v<StrippedT>,
+                        is_std_list_v<StrippedT> ||
+                        is_std_map_v<StrippedT> ||
+                        is_std_set_v<StrippedT> ||
+                        is_std_unordered_map_v<StrippedT> ||
+                        is_std_unordered_set_v<StrippedT>,
                         "BinarySerializer: Unsupported type for deserialize_object. "
-                        "Type must be fundamental, std::string, std::vector, std::map, "
+                        "Type must be fundamental, std::string, std::vector, std::list, std::map, std::set, std::unordered_map, std::unordered_set, "
                         "or implement the BinarySerialiable interface.");
                     return false;
                 }

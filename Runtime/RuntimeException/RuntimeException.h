@@ -22,6 +22,13 @@ namespace cyanvne
                 InitWMSystemException(const std::string& message) : CyanVNERuntimeException(message)
                 {  }
             };
+
+            class InitEventCoreException : public CyanVNERuntimeException
+            {
+            public:
+                InitEventCoreException(const std::string& message) : CyanVNERuntimeException(message)
+                {  }
+            };
         }
     }
 }

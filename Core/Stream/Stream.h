@@ -14,6 +14,7 @@ namespace cyanvne
 				End
 			};
 
+			// Thread not safe
 			class InStreamInterface
 			{
 			protected:
@@ -32,6 +33,7 @@ namespace cyanvne
                 virtual ~InStreamInterface() = default;
 			};
 
+			// Thread not safe
 			class OutStreamInterface
 			{
 			protected:
@@ -51,6 +53,7 @@ namespace cyanvne
 				virtual ~OutStreamInterface() = default;
 			};
 
+			// Thread not safe
 			class StreamInterface : public InStreamInterface, public OutStreamInterface
 			{
 			protected:

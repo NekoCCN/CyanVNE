@@ -18,7 +18,7 @@ namespace cyanvne
 {
     namespace runtime
     {
-        class GuiContext : public basicrender::ChangeableWindowSizeInterface
+        class GuiContext : public basicrender::ChangeableWindowSizeInterface, basicrender::ResponsiveInterface
         {
         private:
             static std::mutex _mutex;
@@ -68,6 +68,11 @@ namespace cyanvne
                     _mutex.unlock();
                 }
                 return std::shared_ptr<GuiContext>(const_cast<GuiContext*>(_instance));
+            }
+
+            void response(SDL_Event* event) override
+            {
+                ImGui_ImplSDL3_ProcessEvent(event);
             }
 
             ImGuiIO& getIOContext() const
