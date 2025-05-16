@@ -17,7 +17,7 @@ createFromBinaryFile(const std::string& path)
 std::shared_ptr<cyanvne::resources::InStreamUniversalImpl> cyanvne::resources::InStreamUniversalImpl::createFromMemory(
 	void* data, size_t size)
 {
-	core::GlobalLogger::getCoreLogger()->info("Try creating InStreamUniversalImpl from memory", size);
+	core::GlobalLogger::getCoreLogger()->info("Try creating InStreamUniversalImpl from memory，size : {:d}", size);
 				
 	SDL_IOStream* stream = SDL_IOFromMem(data, size);
 	if (!stream)
@@ -28,7 +28,7 @@ std::shared_ptr<cyanvne::resources::InStreamUniversalImpl> cyanvne::resources::I
 	return std::make_shared<InStreamUniversalImpl>(stream);
 }
 
-bool cyanvne::resources::InStreamUniversalImpl::read(void* buffer, size_t size)
+size_t cyanvne::resources::InStreamUniversalImpl::read(void* buffer, size_t size)
 {
 	if (!in_stream_)
 	{
@@ -39,10 +39,10 @@ bool cyanvne::resources::InStreamUniversalImpl::read(void* buffer, size_t size)
 		throw exception::NullPointerException("InStreamUniversalImpl ：Null pointer in read");
 	}
 
-	return SDL_ReadIO(in_stream_, buffer, size) == size;
+	return SDL_ReadIO(in_stream_, buffer, size);
 }
 
-bool cyanvne::resources::InStreamUniversalImpl::seek(int64_t offset, core::stream::SeekMode mode)
+int64_t cyanvne::resources::InStreamUniversalImpl::seek(int64_t offset, core::stream::SeekMode mode)
 {
 	if (!in_stream_)
 	{
@@ -64,7 +64,7 @@ bool cyanvne::resources::InStreamUniversalImpl::seek(int64_t offset, core::strea
 		break;
 	}
 
-	return SDL_SeekIO(in_stream_, offset, whence) >= 0;
+	return SDL_SeekIO(in_stream_, offset, whence);
 }
 
 int64_t cyanvne::resources::InStreamUniversalImpl::tell()
@@ -109,7 +109,7 @@ createFromMemory(void* data, size_t size)
 	return std::make_shared<OutStreamUniversalImpl>(SDL_IOFromMem(data, size));
 }
 
-bool cyanvne::resources::OutStreamUniversalImpl::write(const void* buffer, size_t size)
+size_t cyanvne::resources::OutStreamUniversalImpl::write(const void* buffer, size_t size)
 {
 	if (!out_stream_)
 	{
@@ -120,14 +120,14 @@ bool cyanvne::resources::OutStreamUniversalImpl::write(const void* buffer, size_
 		throw exception::NullPointerException("InStreamUniversalImpl ：Null pointer in write");
 	}
 
-	return SDL_WriteIO(out_stream_, buffer, size) == size;
+	return SDL_WriteIO(out_stream_, buffer, size);
 }
 
-bool cyanvne::resources::OutStreamUniversalImpl::seek(int64_t offset, core::stream::SeekMode mode)
+int64_t cyanvne::resources::OutStreamUniversalImpl::seek(int64_t offset, core::stream::SeekMode mode)
 {
 	if (!out_stream_)
 	{
-		return false;
+		return 0;
 	}
 
 	SDL_IOWhence whence = SDL_IO_SEEK_SET;
@@ -145,7 +145,7 @@ bool cyanvne::resources::OutStreamUniversalImpl::seek(int64_t offset, core::stre
 		break;
 	}
 
-	return SDL_SeekIO(out_stream_, offset, whence) >= 0;
+	return SDL_SeekIO(out_stream_, offset, whence);
 }
 
 int64_t cyanvne::resources::OutStreamUniversalImpl::tell()
@@ -186,27 +186,27 @@ cyanvne::resources::OutStreamUniversalImpl::~OutStreamUniversalImpl()
 	}
 }
 
-bool cyanvne::resources::DynamicMemoryStreamImpl::read(void* buffer, size_t size)
+size_t cyanvne::resources::DynamicMemoryStreamImpl::read(void* buffer, size_t size)
 {
 	if (!stream_)
 	{
 		return false;
 	}
 
-	return SDL_ReadIO(stream_, buffer, size) == size;
+	return SDL_ReadIO(stream_, buffer, size);
 }
 
-bool cyanvne::resources::DynamicMemoryStreamImpl::write(const void* buffer, size_t size)
+size_t cyanvne::resources::DynamicMemoryStreamImpl::write(const void* buffer, size_t size)
 {
 	if (!stream_)
 	{
 		return false;
 	}
 
-	return SDL_WriteIO(stream_, buffer, size) == size;
+	return SDL_WriteIO(stream_, buffer, size);
 }
 
-bool cyanvne::resources::DynamicMemoryStreamImpl::seek(int64_t offset, core::stream::SeekMode mode)
+int64_t cyanvne::resources::DynamicMemoryStreamImpl::seek(int64_t offset, core::stream::SeekMode mode)
 {
 	if (!stream_)
 	{
@@ -228,7 +228,7 @@ bool cyanvne::resources::DynamicMemoryStreamImpl::seek(int64_t offset, core::str
 		break;
 	}
 
-	return SDL_SeekIO(stream_, offset, whence) >= 0;
+	return SDL_SeekIO(stream_, offset, whence);
 }
 
 int64_t cyanvne::resources::DynamicMemoryStreamImpl::tell()

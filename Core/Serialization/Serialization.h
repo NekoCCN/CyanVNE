@@ -103,13 +103,13 @@ namespace cyanvne
                 else if constexpr (std::is_same_v<StrippedT, std::string>)
                 {
                     size_t len = value.length();
-                    if (!out.write(&len, sizeof(len)))
+                    if (out.write(&len, sizeof(len)) != sizeof(len))
                     {
                         return false;
                     }
                     if (len > 0)
                     {
-                        if (!out.write(value.data(), len))
+                        if (out.write(value.data(), len) != sizeof(len))
                         {
                             return false;
                         }
@@ -119,7 +119,7 @@ namespace cyanvne
                 else if constexpr (is_std_vector_v<StrippedT> || is_std_list_v<StrippedT>)
                 {
                     size_t size = value.size();
-                    if (!out.write(&size, sizeof(size)))
+                    if (out.write(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }
@@ -135,7 +135,7 @@ namespace cyanvne
                 else if constexpr (is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT>)
                 {
                     size_t size = value.size();
-                    if (!out.write(&size, sizeof(size)))
+                    if (out.write(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }
@@ -155,7 +155,7 @@ namespace cyanvne
                 else if constexpr (is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>) // 合并 set 和 unordered_set
                 {
                     size_t size = value.size();
-                    if (!out.write(&size, sizeof(size)))
+                    if (out.write(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }
@@ -202,14 +202,14 @@ namespace cyanvne
                 else if constexpr (std::is_same_v<StrippedT, std::string>)
                 {
                     size_t len;
-                    if (!in.read(&len, sizeof(len)))
+                    if (in.read(&len, sizeof(len)) != sizeof(len))
                     {
                         return false;
                     }
                     value.resize(len);
                     if (len > 0)
                     {
-                        if (!in.read(&value[0], len))
+                        if (in.read(value.data(), len) != sizeof(len))
                         {
                             return false;
                         }
@@ -219,7 +219,7 @@ namespace cyanvne
                 else if constexpr (is_std_vector_v<StrippedT>)
                 {
                     size_t size;
-                    if (!in.read(&size, sizeof(size)))
+                    if (in.read(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }
@@ -237,7 +237,7 @@ namespace cyanvne
                 else if constexpr (is_std_list_v<StrippedT>)
                 {
                     size_t size;
-                    if (!in.read(&size, sizeof(size)))
+                    if (in.read(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }
@@ -256,7 +256,7 @@ namespace cyanvne
                 else if constexpr (is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT>)
                 {
                     size_t size;
-                    if (!in.read(&size, sizeof(size)))
+                    if (in.read(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }
@@ -280,7 +280,7 @@ namespace cyanvne
                 else if constexpr (is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>) // 合并 set 和 unordered_set
                 {
                     size_t size;
-                    if (!in.read(&size, sizeof(size)))
+                    if (in.read(&size, sizeof(size)) != sizeof(len))
                     {
                         return false;
                     }

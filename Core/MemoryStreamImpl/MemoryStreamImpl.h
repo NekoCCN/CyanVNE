@@ -28,9 +28,9 @@ namespace cyanvne
                 DynamicMemoryStreamImpl& operator=(const DynamicMemoryStreamImpl& other);
                 DynamicMemoryStreamImpl& operator=(DynamicMemoryStreamImpl&& other) noexcept;
 
-                bool read(void* buffer, size_t size) override;
-                bool write(const void* buffer, size_t size) override;
-                bool seek(int64_t offset, SeekMode mode) override;
+                size_t read(void* buffer, size_t size) override;
+                size_t write(const void* buffer, size_t size) override;
+                int64_t seek(int64_t offset, SeekMode mode) override;
                 bool boundedSeek(int64_t offset, SeekMode mode);
                 int64_t tell() override;
                 bool is_open() override;
@@ -59,9 +59,9 @@ namespace cyanvne
                 FixedSizeMemoryStreamImpl& operator=(const FixedSizeMemoryStreamImpl& other);
                 FixedSizeMemoryStreamImpl& operator=(FixedSizeMemoryStreamImpl&& other) noexcept;
 
-                bool read(void* buffer, size_t size) override;
-                bool write(const void* buffer, size_t size) override;
-                bool seek(int64_t offset, SeekMode mode) override;
+                size_t read(void* buffer, size_t size) override;
+                size_t write(const void* buffer, size_t size) override;
+                int64_t seek(int64_t offset, SeekMode mode) override;
                 int64_t tell() override;
                 bool is_open() override;
                 void flush() override;

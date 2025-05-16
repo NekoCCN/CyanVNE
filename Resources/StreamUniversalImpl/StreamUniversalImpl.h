@@ -26,8 +26,8 @@ namespace cyanvne
 			static std::shared_ptr<InStreamUniversalImpl> createFromBinaryFile(const std::string& path);
 			static std::shared_ptr<InStreamUniversalImpl> createFromMemory(void* data, size_t size);
 
-			bool read(void* buffer, size_t size) override;
-			bool seek(int64_t offset, core::stream::SeekMode mode) override;
+			size_t read(void* buffer, size_t size) override;
+			int64_t seek(int64_t offset, core::stream::SeekMode mode) override;
 			int64_t tell() override;
 			bool is_open() override;
 
@@ -51,8 +51,8 @@ namespace cyanvne
 			static std::shared_ptr<OutStreamUniversalImpl> createFromBinaryFile(const std::string& path);
 			static std::shared_ptr<OutStreamUniversalImpl> createFromMemory(void* data, size_t size);
 
-			bool write(const void* buffer, size_t size) override;
-			bool seek(int64_t offset, core::stream::SeekMode mode) override;
+			size_t write(const void* buffer, size_t size) override;
+			int64_t seek(int64_t offset, core::stream::SeekMode mode) override;
 			int64_t tell() override;
 			void flush() override;
 			bool is_open() override;
@@ -75,9 +75,9 @@ namespace cyanvne
             DynamicMemoryStreamImpl& operator=(const DynamicMemoryStreamImpl&) = delete;
             DynamicMemoryStreamImpl& operator=(DynamicMemoryStreamImpl&&) = delete;
 
-			bool read(void* buffer, size_t size) override;
-			bool write(const void* buffer, size_t size) override;
-			bool seek(int64_t offset, core::stream::SeekMode mode) override;
+			size_t read(void* buffer, size_t size) override;
+			size_t write(const void* buffer, size_t size) override;
+			int64_t seek(int64_t offset, core::stream::SeekMode mode) override;
 			int64_t tell() override;
 			void flush() override;
 			bool is_open() override;

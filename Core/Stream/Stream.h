@@ -25,8 +25,8 @@ namespace cyanvne
 				InStreamInterface(InStreamInterface&&) = delete;
                 InStreamInterface& operator=(InStreamInterface&&) = delete;
 
-                virtual bool read(void* buffer, size_t size) = 0;
-                virtual bool seek(int64_t offset, SeekMode mode) = 0;
+                virtual size_t read(void* buffer, size_t size) = 0;
+                virtual int64_t seek(int64_t offset, SeekMode mode) = 0;
                 virtual int64_t tell() = 0;
 				virtual bool is_open() = 0;
 
@@ -44,8 +44,8 @@ namespace cyanvne
 				OutStreamInterface(OutStreamInterface&&) = delete;
 				OutStreamInterface& operator=(OutStreamInterface&&) = delete;
 
-				virtual bool write(const void* buffer, size_t size) = 0;
-				virtual bool seek(int64_t offset, SeekMode mode) = 0;
+				virtual size_t write(const void* buffer, size_t size) = 0;
+				virtual int64_t seek(int64_t offset, SeekMode mode) = 0;
 				virtual int64_t tell() = 0;
 				virtual void flush() = 0;
 				virtual bool is_open() = 0;
