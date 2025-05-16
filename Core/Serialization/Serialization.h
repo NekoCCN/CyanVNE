@@ -119,7 +119,7 @@ namespace cyanvne
                 else if constexpr (is_std_vector_v<StrippedT> || is_std_list_v<StrippedT>)
                 {
                     size_t size = value.size();
-                    if (out.write(&size, sizeof(size)) != sizeof(len))
+                    if (out.write(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
@@ -135,7 +135,7 @@ namespace cyanvne
                 else if constexpr (is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT>)
                 {
                     size_t size = value.size();
-                    if (out.write(&size, sizeof(size)) != sizeof(len))
+                    if (out.write(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
@@ -155,7 +155,7 @@ namespace cyanvne
                 else if constexpr (is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>) // 合并 set 和 unordered_set
                 {
                     size_t size = value.size();
-                    if (out.write(&size, sizeof(size)) != sizeof(len))
+                    if (out.write(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
@@ -219,7 +219,7 @@ namespace cyanvne
                 else if constexpr (is_std_vector_v<StrippedT>)
                 {
                     size_t size;
-                    if (in.read(&size, sizeof(size)) != sizeof(len))
+                    if (in.read(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
@@ -237,7 +237,7 @@ namespace cyanvne
                 else if constexpr (is_std_list_v<StrippedT>)
                 {
                     size_t size;
-                    if (in.read(&size, sizeof(size)) != sizeof(len))
+                    if (in.read(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
@@ -256,7 +256,7 @@ namespace cyanvne
                 else if constexpr (is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT>)
                 {
                     size_t size;
-                    if (in.read(&size, sizeof(size)) != sizeof(len))
+                    if (in.read(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
@@ -280,7 +280,7 @@ namespace cyanvne
                 else if constexpr (is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>) // 合并 set 和 unordered_set
                 {
                     size_t size;
-                    if (in.read(&size, sizeof(size)) != sizeof(len))
+                    if (in.read(&size, sizeof(size)) != sizeof(size))
                     {
                         return false;
                     }
