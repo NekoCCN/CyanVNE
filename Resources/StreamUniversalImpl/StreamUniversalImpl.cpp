@@ -2,9 +2,7 @@
 
 std::shared_ptr<cyanvne::resources::InStreamUniversalImpl> cyanvne::resources::InStreamUniversalImpl::
 createFromBinaryFile(const std::string& path)
-{
-	core::GlobalLogger::getCoreLogger()->info("Try creating InStreamUniversalImpl from file");
-				
+{				
 	SDL_IOStream* stream = SDL_IOFromFile(path.c_str(), "rb");
 	if (!stream)
 	{
@@ -16,9 +14,7 @@ createFromBinaryFile(const std::string& path)
 
 std::shared_ptr<cyanvne::resources::InStreamUniversalImpl> cyanvne::resources::InStreamUniversalImpl::createFromMemory(
 	void* data, size_t size)
-{
-	core::GlobalLogger::getCoreLogger()->info("Try creating InStreamUniversalImpl from memory，size : {:d}", size);
-				
+{			
 	SDL_IOStream* stream = SDL_IOFromMem(data, size);
 	if (!stream)
 	{

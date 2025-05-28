@@ -2,7 +2,6 @@
 #include <SDL3/SDL.h>
 #include <Core/Logger/Logger.h>
 #include <Core/Stream/Stream.h>
-#include <Core/CoreException/CoreException.h>
 #include <cstdint>
 
 namespace cyanvne
