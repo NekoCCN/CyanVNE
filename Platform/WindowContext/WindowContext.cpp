@@ -2,7 +2,7 @@
 
 using namespace cyanvne;
 
-runtime::WindowContext::WindowContext(const char* title, uint32_t width, uint32_t height, const char* drive, SDL_WindowFlags flags)
+platform::WindowContext::WindowContext(const char* title, uint32_t width, uint32_t height, const char* drive, SDL_WindowFlags flags)
 {
 	// window part
 	core::GlobalLogger::getCoreLogger()->info("Try to create a window context");
@@ -11,7 +11,7 @@ runtime::WindowContext::WindowContext(const char* title, uint32_t width, uint32_
 	if (window_ == nullptr)
 	{
 		core::GlobalLogger::getCoreLogger()->critical("Failed to create window context : {:s}", SDL_GetError());
-		throw exception::runtimeexception::CreateWindowContextException("Failed to create window context");
+		throw exception::platformexception::CreateWindowContextException("Failed to create window context");
 	}
 
 	// renderer part
@@ -27,7 +27,7 @@ runtime::WindowContext::WindowContext(const char* title, uint32_t width, uint32_
 	if (sdl_renderer_ == nullptr)
 	{
 		core::GlobalLogger::getCoreLogger()->critical("Failed to create graphic context : {:s}", SDL_GetError());
-		throw exception::runtimeexception::CreateWindowContextException("Failed to create graphic context");
+		throw exception::platformexception::CreateWindowContextException("Failed to create graphic context");
 	}
 	SDL_ShowWindow(window_);
 }

@@ -7,7 +7,7 @@ namespace cyanvne
 {
     namespace exception
     {
-        namespace runtimeexception
+        namespace platformexception
         {
             class CreateWindowContextException : public CyanVNERuntimeException
             {

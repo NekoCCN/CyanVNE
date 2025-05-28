@@ -1,6 +1,7 @@
 #include "BasicRender.h"
 
-bool cyanvne::runtime::basicrender::ResponsiveInterface::universalMouseEventListen(const SDL_Event* event, MouseEvent event_type, const SDL_FRect& rect)
+bool cyanvne::platform::basicrender::ResponsiveUtils::universalMouseEventListen(const SDL_Event* event,
+	MouseEvent event_type, const SDL_FRect& rect)
 {
 	if (event_type == MouseEvent::MOUSE_BUTTON_DOWN)
 	{

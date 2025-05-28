@@ -1,6 +1,6 @@
 #include "GuiContext.h"
 
-inline cyanvne::runtime::GuiContext::GuiContext(const std::shared_ptr<WindowContext>& window, const std::shared_ptr<char>& font_data, uint64_t font_size, float size_pixels, float scale)
+inline cyanvne::platform::GuiContext::GuiContext(const std::shared_ptr<WindowContext>& window, const std::shared_ptr<char>& font_data, uint64_t font_size, float size_pixels, float scale)
     : font_size_(font_size), font_pixels_size_(size_pixels)
 {
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Try to Creating GUI Context");

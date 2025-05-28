@@ -1,13 +1,13 @@
 #pragma once
 #include <SDL3/SDL.h>
-#include <Runtime/RuntimeException/RuntimeException.h>
+#include <Platform/PlatformException/PlatformException.h>
 #include <Core/Logger/Logger.h>
 #include <string>
 #include <vector>
 
 namespace cyanvne
 {
-	namespace runtime
+	namespace platform
 	{
 		class WindowContext
 		{

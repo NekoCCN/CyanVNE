@@ -8,17 +8,17 @@
 #else
 #include <SDL3/SDL_opengl.h>
 #endif
-#include <Runtime/WindowContext/WindowContext.h>
-#include <Runtime/BasicRender/BasicRender.h>
+#include <Platform/WindowContext/WindowContext.h>
+#include <Platform/BasicRender/BasicRender.h>
 #include <algorithm>
 #include <memory>
 #include <mutex>
 
 namespace cyanvne
 {
-    namespace runtime
+    namespace platform
     {
-        class GuiContext : public basicrender::ChangeableWindowSizeInterface, basicrender::ResponsiveInterface
+        class GuiContext : public basicrender::IChangeableWindowSize
         {
         private:
             static std::mutex _mutex;

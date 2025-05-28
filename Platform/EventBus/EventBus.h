@@ -12,7 +12,7 @@
 
 namespace cyanvne
 {
-	namespace runtime
+	namespace platform
 	{
 		class EventCore
 		{

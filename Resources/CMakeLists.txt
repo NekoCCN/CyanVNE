@@ -3,12 +3,17 @@ include_directories( "./" )
 
 set(CyanVNEResources_SRC
   "StreamUniversalImpl/StreamUniversalImpl.h"
-  "StreamUniversalImpl/StreamUniversalImpl.cpp")
+  "StreamUniversalImpl/StreamUniversalImpl.cpp"
+  "ThemePackCreator/ThemePackCreator.h"
+  "ThemePackCreator/ThemePackCreator.cpp"
+  "ThemeMinimumRequire/ThemeMinimumRequire.h"
+)
 
 add_library(CyanVNEResources STATIC ${CyanVNEResources_SRC})
 
 set(CyanVNEResources_Require
   CyanVNECore
+  CyanVNEParser
   SDL3-static
 )
 

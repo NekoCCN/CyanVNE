@@ -3,7 +3,7 @@
 #include <iostream>
 #include <SDL3/SDL.h>
 #include <Core/Logger/Logger.h>
-#include "Runtime/RuntimeException/RuntimeException.h"
+#include "Platform/PlatformException/PlatformException.h"
 #include <SDL3_ttf/SDL_ttf.h>
 #ifdef IS_WIN32_SYS
 #include <windows.h>
@@ -11,7 +11,7 @@
 
 namespace cyanvne
 {
-	namespace runtime
+	namespace platform
 	{
 		class WMInitializer
 		{
@@ -21,7 +21,7 @@ namespace cyanvne
 				if (!SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMEPAD))
 				{
 					core::GlobalLogger::getCoreLogger()->critical("Window system initialization failed : {:s}", SDL_GetError());
-					throw exception::runtimeexception::InitWMSystemException("SDL3 initialization failed");
+					throw exception::platformexception::InitWMSystemException("SDL3 initialization failed");
 				}
 				else
 				{
@@ -34,7 +34,7 @@ namespace cyanvne
 				if (!TTF_Init())
 				{
 					core::GlobalLogger::getCoreLogger()->critical("TrueType system initialization failed : {:s}", SDL_GetError());
-					throw exception::runtimeexception::InitWMSystemException("SDL3_TTF initialization failed");
+					throw exception::platformexception::InitWMSystemException("SDL3_TTF initialization failed");
 				}
 				else
 				{

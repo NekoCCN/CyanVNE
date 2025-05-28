@@ -11,6 +11,9 @@ if (CMAKE_HOST_WIN32)
   add_compile_definitions( IS_WIN32_SYS )
 endif()
 
+# Boost
+add_subdirectory( "External/boost" )
+
 # SDL
 set (BUILD_SHARED_LIBS false)
 set(SDL_STATIC on)
@@ -51,6 +54,7 @@ include_directories( "External/yaml-cpp/include" )
 include_directories( "./" )
 add_subdirectory ("CyanVNE")
 add_subdirectory ("Core")
+add_subdirectory ("Platform")
 add_subdirectory ("Resources")
 add_subdirectory ("Runtime")
-# add_subdirectory ("Resolution")
+add_subdirectory ("Parser")
