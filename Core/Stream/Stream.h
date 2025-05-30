@@ -66,6 +66,16 @@ namespace cyanvne
 
                 ~StreamInterface() override = default;
 			};
+
+			namespace utils
+			{
+				uint64_t copy_stream_chunked(
+					InStreamInterface& in, OutStreamInterface& out, 
+					size_t buffer_size = 8192);
+
+				int64_t instream_size(InStreamInterface& in);
+				int64_t outstream_size(OutStreamInterface& out);
+			}
 		}
 	}
 }

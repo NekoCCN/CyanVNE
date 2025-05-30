@@ -8,7 +8,7 @@ set(CyanVNECore_SRC
   "TSVector/TSVector.h"
   "Serialization/Serialization.h"
   "MemoryStreamImpl/MemoryStreamImpl.h"
-  "MemoryStreamImpl/MemoryStreamImpl.cpp")
+  "MemoryStreamImpl/MemoryStreamImpl.cpp" "PathToStream/PathToStream.h" "Stream/Stream.cpp")
 
 add_library(CyanVNECore STATIC ${CyanVNECore_SRC})
 

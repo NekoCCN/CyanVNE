@@ -6,6 +6,48 @@ namespace cyanvne
 {
     namespace parser
     {
+        std::ptrdiff_t ThemeConfig::ThemeConfigFileHeader::serialize(core::stream::OutStreamInterface& out) const
+        {
+            std::ptrdiff_t total_bytes_written = 0;
+
+            std::ptrdiff_t bytes_written = core::binaryserializer::serialize_object(out, version);
+            if (bytes_written == -1)
+            {
+                return -1;
+            }
+            total_bytes_written += bytes_written;
+
+            bytes_written = core::binaryserializer::serialize_object(out, magic);
+            if (bytes_written == -1)
+            {
+                return -1;
+            }
+            total_bytes_written += bytes_written;
+
+            return total_bytes_written;
+        }
+
+        std::ptrdiff_t ThemeConfig::ThemeConfigFileHeader::deserialize(core::stream::InStreamInterface& in)
+        {
+            std::ptrdiff_t total_bytes_read = 0;
+
+            std::ptrdiff_t bytes_read = core::binaryserializer::deserialize_object(in, version);
+            if (bytes_read == -1)
+            {
+                return -1;
+            }
+            total_bytes_read += bytes_read;
+
+            bytes_read = core::binaryserializer::deserialize_object(in, magic);
+            if (bytes_read == -1)
+            {
+                return -1;
+            }
+            total_bytes_read += bytes_read;
+
+            return total_bytes_read;
+        }
+
         auto ThemeConfig::getMembersTuple()
         {
             return std::tie(
@@ -46,77 +88,97 @@ namespace cyanvne
             );
         }
 
-        bool ThemeConfig::serialize(cyanvne::core::stream::OutStreamInterface& out) const
+        std::ptrdiff_t ThemeConfig::serialize(cyanvne::core::stream::OutStreamInterface& out) const
         {
-            if (!out.is_open())
-            {
-                return false;
-            }
+            std::ptrdiff_t total_bytes_written = 0;
 
             ThemeConfigFileHeader header_to_write;
-            if (!header_to_write.serialize(out))
+            std::ptrdiff_t bytes_written = header_to_write.serialize(out);
+            if (bytes_written == -1)
             {
-                return false;
+                return -1;
             }
+            total_bytes_written += bytes_written;
 
-            bool success = true;
-            std::apply([&](const auto&... args)
+            bool Succeeded = true;
+            std::apply(
+                [&](const auto&... args)
                 {
-                    auto serialize_if_successful = [&](const auto& arg_to_serialize)
+                    auto serialize_member =
+                        [&](const auto& member_to_serialize)
                         {
-                            if (success)
+                            if (!Succeeded)
                             {
-                                success = core::binaryserializer::serialize_object(out, arg_to_serialize);
+                                return;
                             }
-                        }; (serialize_if_successful(args), ...);
+                            std::ptrdiff_t current_bytes_written = core::binaryserializer::serialize_object(out, member_to_serialize);
+                            if (current_bytes_written == -1)
+                            {
+                                Succeeded = false;
+                                return;
+                            }
+                            total_bytes_written += current_bytes_written;
+                        };
+                    (serialize_member(args), ...);
                 }, getMembersTupleConst());
 
-            if (!success)
+            if (!Succeeded)
             {
-                return false;
+                return -1;
             }
-            return true;
+
+            return total_bytes_written;
         }
 
-        bool ThemeConfig::deserialize(cyanvne::core::stream::InStreamInterface& in)
+        std::ptrdiff_t ThemeConfig::deserialize(cyanvne::core::stream::InStreamInterface& in)
         {
-            if (!in.is_open())
-            {
-                return false;
-            }
+            std::ptrdiff_t total_bytes_read = 0;
 
             ThemeConfigFileHeader default_header_for_comparison;
             ThemeConfigFileHeader header_read_from_file;
 
-            if (!header_read_from_file.deserialize(in))
+            std::ptrdiff_t bytes_read = header_read_from_file.deserialize(in);
+            if (bytes_read == -1)
             {
-                return false;
+                return -1;
             }
+            total_bytes_read += bytes_read;
 
             constexpr double epsilon = 1e-7;
             if (std::abs(header_read_from_file.version - default_header_for_comparison.version) > epsilon ||
                 header_read_from_file.magic != default_header_for_comparison.magic)
             {
-                return false;
+                return -1;
             }
 
-            bool success = true;
-            std::apply([&](auto&... args)
+            bool Succeeded = true;
+            std::apply(
+                [&](auto&... args)
                 {
-                    auto deserialize_if_successful = [&](auto& arg_to_deserialize)
+                    auto deserialize_member =
+                        [&](auto& member_to_deserialize)
                         {
-                        if (success)
-                        {
-                        success = core::binaryserializer::deserialize_object(in, arg_to_deserialize);
-                        }
-                        }; (deserialize_if_successful(args), ...);
+                            if (!Succeeded)
+                            {
+                                return;
+                            }
+                            std::ptrdiff_t current_bytes_read = core::binaryserializer::deserialize_object(in, member_to_deserialize);
+                            if (current_bytes_read == -1)
+                            {
+                                Succeeded = false;
+                                return;
+                            }
+                            total_bytes_read += current_bytes_read;
+                        };
+                    (deserialize_member(args), ...);
                 }, getMembersTuple());
 
-            if (!success)
+            if (!Succeeded)
             {
-                return false;
+                return -1;
             }
-            return true;
+
+            return total_bytes_read;
         }
     }
 }

@@ -2,8 +2,11 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <cstddef>
 #include <Core/Serialization/Serialization.h>
 #include <Core/Stream/Stream.h>
+#include <tuple>
+#include <cmath>
 
 namespace cyanvne
 {
@@ -16,30 +19,8 @@ namespace cyanvne
                 double version = 0.1;
                 uint64_t magic = 0xADAA2A4A6EF14F4EULL;
 
-                bool serialize(core::stream::OutStreamInterface& out) const
-                {
-                    if (!core::binaryserializer::serialize_object(out, version))
-                    {
-                        return false;
-                    }
-                    if (!core::binaryserializer::serialize_object(out, magic))
-                    {
-                        return false;
-                    }
-                    return true;
-                }
-                bool deserialize(core::stream::InStreamInterface& in)
-                {
-                    if (!core::binaryserializer::deserialize_object(in, version))
-                    {
-                        return false;
-                    }
-                    if (!core::binaryserializer::deserialize_object(in, magic))
-                    {
-                        return false;
-                    }
-                    return true;
-                }
+                std::ptrdiff_t serialize(core::stream::OutStreamInterface& out) const;
+                std::ptrdiff_t deserialize(core::stream::InStreamInterface& in);
             };
 
             std::string name;
@@ -125,8 +106,8 @@ namespace cyanvne
             std::vector<std::vector<uint32_t>> hide_dialog_sprite_sheet;
             std::vector<double> hide_dialog_rendering_area_scale;
 
-            bool serialize(cyanvne::core::stream::OutStreamInterface& out) const override;
-            bool deserialize(cyanvne::core::stream::InStreamInterface& in) override;
+            std::ptrdiff_t serialize(cyanvne::core::stream::OutStreamInterface& out) const override;
+            std::ptrdiff_t deserialize(cyanvne::core::stream::InStreamInterface& in) override;
 
         private:
             auto getMembersTuple();

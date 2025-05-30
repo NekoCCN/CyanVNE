@@ -104,6 +104,8 @@ namespace cyanvne
                     settings_.logger_config_.file_path = util::getScalarNodeElseThrow<std::string>(file_log_node, "file_path", parser_name_);
                     settings_.logger_config_.is_rotating = util::getScalarNodeElseThrow<bool>(file_log_node, "rotating", parser_name_);
                 }
+
+                settings_.is_default_font = util::getScalarNodeElseThrow<bool>(node, "enable", parser_name_);
             }
 
             void AppSettingsParser::parse(

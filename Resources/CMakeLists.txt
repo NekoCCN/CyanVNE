@@ -7,7 +7,11 @@ set(CyanVNEResources_SRC
   "ThemePackCreator/ThemePackCreator.h"
   "ThemePackCreator/ThemePackCreator.cpp"
   "ThemeMinimumRequire/ThemeMinimumRequire.h"
-)
+  "ResourcesPacker/ResourcesPacker.h"
+  "ResourcesPacker/ResourcesPacker.cpp"
+  "ResourcesException/ResourcesException.h"
+  "ResourcesDefination/ResourcesDefination.h"
+ "UniversalPathToStream/UniversalPathToStream.h")
 
 add_library(CyanVNEResources STATIC ${CyanVNEResources_SRC})
 

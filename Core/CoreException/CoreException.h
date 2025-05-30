@@ -29,6 +29,12 @@ namespace cyanvne
             IllegalArgumentException(const std::string& message) : CyanVNELogicException(message)
             {  }
         };
+        class IllegalStateException : public CyanVNELogicException
+        {
+        public:
+            IllegalStateException(const std::string& message) : CyanVNELogicException(message)
+            {  }
+        };
         class NullPointerException : public CyanVNELogicException
         {
         public:

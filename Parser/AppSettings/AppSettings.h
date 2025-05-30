@@ -38,6 +38,8 @@ namespace cyanvne
                 std::set<std::string> extra_languages_support;
 
                 core::GlobalLogger::LoggerConfig logger_config_;
+
+                bool is_default_font = false;
             };
 
             class AppSettingsParser : public ParserYamlInterface
