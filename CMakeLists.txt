@@ -14,6 +14,13 @@ endif()
 # Boost
 add_subdirectory( "External/boost" )
 
+# Lua
+set ( LUA_LANGUAGE "CXX" )
+set ( LUA_LANGUAGE_SUPPORT "CXX" )
+set ( LUA_USE_LONGJMP OFF )
+set ( LUA_USE_APICHECK ON )
+add_subdirectory( "External/lua-cmake" )
+
 # SDL
 set (BUILD_SHARED_LIBS false)
 set(SDL_STATIC on)

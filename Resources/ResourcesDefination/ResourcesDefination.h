@@ -11,7 +11,7 @@ namespace cyanvne
 	{
 		enum class ResourceType
 		{
-			DEFINITION,
+			CONFIG_DATA,
 
 			FONT,
 

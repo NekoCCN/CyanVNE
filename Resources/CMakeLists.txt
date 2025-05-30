@@ -4,14 +4,15 @@ include_directories( "./" )
 set(CyanVNEResources_SRC
   "StreamUniversalImpl/StreamUniversalImpl.h"
   "StreamUniversalImpl/StreamUniversalImpl.cpp"
-  "ThemePackCreator/ThemePackCreator.h"
-  "ThemePackCreator/ThemePackCreator.cpp"
   "ThemeMinimumRequire/ThemeMinimumRequire.h"
   "ResourcesPacker/ResourcesPacker.h"
   "ResourcesPacker/ResourcesPacker.cpp"
   "ResourcesException/ResourcesException.h"
   "ResourcesDefination/ResourcesDefination.h"
- "UniversalPathToStream/UniversalPathToStream.h")
+  "UniversalPathToStream/UniversalPathToStream.h"
+  "ThemeResourcesPacker/ThemeResourcesPacker.cpp"
+  "ThemeResourcesPacker/ThemeResourcesPacker.h"
+ "ResourcesManager/ResourcesManager.h" "ResourcesManager/ResourcesManager.cpp" "ThemeResourcesManager/ThemeResourcesManager.h" "ThemeResourcesManager/ThemeResourcesManager.cpp")
 
 add_library(CyanVNEResources STATIC ${CyanVNEResources_SRC})
 

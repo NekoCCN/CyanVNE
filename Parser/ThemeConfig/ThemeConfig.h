@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <Core/Serialization/Serialization.h>
 #include <Core/Stream/Stream.h>
-#include <tuple>
 #include <cmath>
 
 namespace cyanvne
@@ -26,7 +25,7 @@ namespace cyanvne
             std::string name;
 
             bool enable_built_in_font = false;
-            std::string basic_font_key;
+            std::string built_in_font_key;
 
             bool enable_main_menu_icon = false;
             std::string main_menu_icon_key;
@@ -106,6 +105,7 @@ namespace cyanvne
             std::vector<std::vector<uint32_t>> hide_dialog_sprite_sheet;
             std::vector<double> hide_dialog_rendering_area_scale;
 
+
             std::ptrdiff_t serialize(cyanvne::core::stream::OutStreamInterface& out) const override;
             std::ptrdiff_t deserialize(cyanvne::core::stream::InStreamInterface& in) override;
 
@@ -120,9 +120,9 @@ namespace cyanvne
             std::string basic_built_in_font_key;
             std::string basic_built_in_font_path;
 
-            bool enable_main_menu_logo;
-            std::string main_menu_logo_key;
-            std::string main_menu_logo_path;
+            bool enable_main_menu_icon;
+            std::string main_menu_icon_key;
+            std::string main_menu_icon_path;
 
             bool enable_background;
             std::string background_key;

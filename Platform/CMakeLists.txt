@@ -9,7 +9,10 @@ set(CyanVNEPlatform_SRC
   "BasicRender/BasicRender.h"
   "BasicRender/BasicRender.cpp"
   "EventBus/EventBus.h"
-  "EventBus/EventBus.cpp")
+  "EventBus/EventBus.cpp"
+  "Monitor/Monitor.h"
+  "Monitor/Monitor.cpp"
+)
 
 add_library(CyanVNEPlatform STATIC ${CyanVNEPlatform_SRC})
 
@@ -17,6 +20,7 @@ set(CyanVNEPlatform_Require
   CyanVNECore
   SDL3-static
   imgui
+  Boost::lockfree
 )
 
 target_link_libraries(CyanVNEPlatform PUBLIC ${CyanVNEPlatform_Require})

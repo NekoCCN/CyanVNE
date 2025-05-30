@@ -51,7 +51,7 @@ namespace cyanvne
         auto ThemeConfig::getMembersTuple()
         {
             return std::tie(
-                name, enable_built_in_font, basic_font_key,
+                name, enable_built_in_font, built_in_font_key,
                 enable_main_menu_icon, main_menu_icon_key, main_menu_icon_ms_per_frame, main_menu_icon_sprite_sheet, main_menu_icon_rendering_area_scale,
                 enable_background, background_key, background_ms_per_frame, background_sprite_sheet, background_rendering_area_scale,
                 enable_create_cyan_data, create_cyan_data_key, create_cyan_data_ms_per_frame, create_cyan_data_sprite_sheet, create_cyan_data_rendering_area_scale,
@@ -71,7 +71,7 @@ namespace cyanvne
         auto ThemeConfig::getMembersTupleConst() const
         {
             return std::tie(
-                name, enable_built_in_font, basic_font_key,
+                name, enable_built_in_font, built_in_font_key,
                 enable_main_menu_icon, main_menu_icon_key, main_menu_icon_ms_per_frame, main_menu_icon_sprite_sheet, main_menu_icon_rendering_area_scale,
                 enable_background, background_key, background_ms_per_frame, background_sprite_sheet, background_rendering_area_scale,
                 enable_create_cyan_data, create_cyan_data_key, create_cyan_data_ms_per_frame, create_cyan_data_sprite_sheet, create_cyan_data_rendering_area_scale,

@@ -165,11 +165,11 @@ namespace cyanvne
                 if (font_node.IsScalar() && font_node.as<std::string>() == "false")
                 {
                     config_.enable_built_in_font = false;
-                    config_.basic_font_key.clear();
+                    config_.built_in_font_key.clear();
                 }
                 else {
                     config_.enable_built_in_font = true;
-                    config_.basic_font_key = "built_in_font";
+                    config_.built_in_font_key = "built_in_font";
                 }
 
                 auto parse_tc_resource = [&](const std::string& key,
@@ -292,7 +292,7 @@ namespace cyanvne
                     };
 
                 parse_tgc_resource("built_in_font", config_.enable_built_in_font, config_.basic_built_in_font_key, config_.basic_built_in_font_path);
-                parse_tgc_resource("main_menu_icon", config_.enable_main_menu_logo, config_.main_menu_logo_key, config_.main_menu_logo_path);
+                parse_tgc_resource("main_menu_icon", config_.enable_main_menu_icon, config_.main_menu_icon_key, config_.main_menu_icon_path);
                 parse_tgc_resource("background", config_.enable_background, config_.background_key, config_.background_path);
                 parse_tgc_resource("create_cyan_data", config_.enable_create_cyan_data, config_.create_cyan_data_key, config_.create_cyan_data_path);
                 parse_tgc_resource("create_cyan_theme", config_.enable_create_cyan_theme, config_.create_cyan_theme_key, config_.create_cyan_theme_path);

@@ -1,8 +1,9 @@
 ﻿
-add_executable (CyanVNE "CyanVNE.cpp" "CyanVNE.h")
+add_executable (CyanVNE "CyanVNE.cpp" "CyanVNE.h" "Application/Application.h" "Application/Application.cpp")
 
 target_link_libraries (CyanVNE 
   CyanVNECore
+  CyanVNEPlatform
   CyanVNEParser
   CyanVNEResources
   CyanVNERuntime

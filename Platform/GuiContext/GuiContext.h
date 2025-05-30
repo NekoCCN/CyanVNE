@@ -48,7 +48,8 @@ namespace cyanvne
                 return std::clamp(final_scale, min_scale, max_scale);
             }
             GuiContext(const std::shared_ptr<WindowContext>& window, const std::shared_ptr<char>& font_data = nullptr,
-                uint64_t font_size = 0, float size_pixels = 30.0f, float scale = 1.0f);
+                uint64_t font_size = 0, float size_pixels = 30.0f, float scale = 1.0f,
+                std::vector<std::string> extra_languages_support = {});
         public:
             GuiContext(const GuiContext&) = delete;
             GuiContext& operator=(const GuiContext&) = delete;
@@ -70,7 +71,7 @@ namespace cyanvne
                 return std::shared_ptr<GuiContext>(const_cast<GuiContext*>(_instance));
             }
 
-            void response(SDL_Event* event) override
+            void response(SDL_Event* event)
             {
                 ImGui_ImplSDL3_ProcessEvent(event);
             }

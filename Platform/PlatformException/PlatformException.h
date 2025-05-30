@@ -1,6 +1,5 @@
 #pragma once
 #include <Core/CoreException/CoreException.h>
-#include <exception>
 #include <stdexcept>
 
 namespace cyanvne
@@ -27,6 +26,15 @@ namespace cyanvne
             {
             public:
                 InitEventCoreException(const std::string& message) : CyanVNERuntimeException(message)
+                {  }
+            };
+
+            class MonitorNotFoundException : public CyanVNERuntimeException
+            {
+            public:
+                MonitorNotFoundException() : CyanVNERuntimeException("Can not found any monitor")
+                {  }
+                MonitorNotFoundException(const std::string& message) : CyanVNERuntimeException(message)
                 {  }
             };
         }

@@ -28,6 +28,27 @@ namespace cyanvne
                 ResourcePackerIOException(const std::string& message) : CyanVNEIOException(message)
                 {  }
             };
+
+            class ResourceManagerIOException : public CyanVNEIOException
+            {
+            public:
+                ResourceManagerIOException(const std::string& message) : CyanVNEIOException(message)
+                {  }
+            };
+
+            class ThemeResourcePackerIOException : public ResourcePackerIOException
+            {
+            public:
+                ThemeResourcePackerIOException(const std::string& message) : ResourcePackerIOException(message)
+                {  }
+            };
+
+            class ThemeResourceManagerIOException : public ResourceManagerIOException
+            {
+            public:
+                ThemeResourceManagerIOException(const std::string& message) : ResourceManagerIOException(message)
+                {  }
+            };
         }
     }
 }

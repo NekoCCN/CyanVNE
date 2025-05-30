@@ -1,7 +1,7 @@
 #include "ResourcesPacker.h"
 
 uint64_t cyanvne::resources::ResourcesPacker::addResourceByStream(
-	std::shared_ptr<core::stream::InStreamInterface> resource_stream, const ResourceType& type,
+	const std::shared_ptr<core::stream::InStreamInterface>& resource_stream, const ResourceType& type,
 	const std::string& optional_alias)
 {
 	if (finalized_)
@@ -24,7 +24,7 @@ uint64_t cyanvne::resources::ResourcesPacker::addResourceByStream(
 
 	if (!optional_alias.empty())
 	{
-		if (alias_to_id_.count(optional_alias))
+		if (alias_to_id_.contains(optional_alias))
 		{
 			throw exception::resourcesexception::ResourcePackerIOException(
 				"Alias '" + optional_alias + "' already exists.");
@@ -72,7 +72,7 @@ uint64_t cyanvne::resources::ResourcesPacker::addResourceByString(const std::str
 
 	if (!optional_alias.empty())
 	{
-		if (alias_to_id_.count(optional_alias))
+		if (alias_to_id_.contains(optional_alias))
 		{
 			throw exception::resourcesexception::ResourcePackerIOException(
 				"Alias '" + optional_alias + "' already exists.");
@@ -124,7 +124,7 @@ uint64_t cyanvne::resources::ResourcesPacker::addResourceByData(const std::vecto
 
 	if (!optional_alias.empty())
 	{
-		if (alias_to_id_.count(optional_alias))
+		if (alias_to_id_.contains(optional_alias))
 		{
 			throw exception::resourcesexception::ResourcePackerIOException(
 				"Alias '" + optional_alias + "' already exists.");
@@ -178,20 +178,22 @@ void cyanvne::resources::ResourcesPacker::finalizePack()
 	}
 	header_.definition_offset_ = static_cast<uint64_t>(def_offset_pos);
 
-	size_t num_definitions = definitions_.size();
-	if (core::binaryserializer::serialize_object(*out_stream_, num_definitions) < 0)
+	if (core::binaryserializer::serialize_object(*out_stream_, definitions_) < 0)
 	{
 		throw exception::resourcesexception::ResourcePackerIOException(
-			"Failed to serialize number of definitions.");
+			"Failed to serialize resource definitions vector.");
 	}
 
-	for (const auto& def : definitions_)
+	if (core::binaryserializer::serialize_object(*out_stream_, id_to_definition_index_) < 0)
 	{
-		if (core::binaryserializer::serialize_object(*out_stream_, def) < 0)
-		{
-			throw exception::resourcesexception::ResourcePackerIOException(
-				"Failed to serialize resource definition for ID: " + std::to_string(def.id));
-		}
+		throw exception::resourcesexception::ResourcePackerIOException(
+			"Failed to serialize id_to_definition_index_ map.");
+	}
+
+	if (core::binaryserializer::serialize_object(*out_stream_, alias_to_id_) < 0)
+	{
+		throw exception::resourcesexception::ResourcePackerIOException(
+			"Failed to serialize alias_to_id_ map.");
 	}
 
 	if (out_stream_->seek(0, core::stream::SeekMode::Begin) == -1)

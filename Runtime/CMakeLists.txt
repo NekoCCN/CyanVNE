@@ -8,6 +8,7 @@ add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 set(CyanVNERuntime_Require
   CyanVNECore
   CyanVNEPlatform
+  lua_library_static
 )
 
 target_link_libraries(CyanVNERuntime PUBLIC ${CyanVNERuntime_Require})

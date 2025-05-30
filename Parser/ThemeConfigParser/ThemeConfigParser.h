@@ -27,7 +27,7 @@ namespace cyanvne
                 ThemeConfig config_;
 
                 static void parseResourceNodeForThemeConfig(
-                    const YAML::Node& resource_node,
+                    const YAML::Node& resource_yaml_node,
                     const std::string& resource_key,
                     bool& enable_flag,
                     std::string& key_field,
@@ -51,7 +51,7 @@ namespace cyanvne
                 ThemeGeneratorConfig config_;
 
                 static void parseResourceNodeForGeneratorConfig(
-                    const YAML::Node& resource_node,
+                    const YAML::Node& resource_yaml_node,
                     const std::string& resource_key,
                     bool& enable_flag,
                     std::string& key_field,
