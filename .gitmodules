@@ -22,3 +22,6 @@
 [submodule "External/boost"]
 	path = External/boost
 	url = https://github.com/boostorg/boost.git
+[submodule "External/lua-cmake"]
+	path = External/lua-cmake
+	url = https://gitlab.com/codelibre/lua/lua-cmake.git
