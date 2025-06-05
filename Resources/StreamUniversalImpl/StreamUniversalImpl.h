@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include <Core/Logger/Logger.h>
 #include <Core/Stream/Stream.h>
+#include <Resources/ResourcesException/ResourcesException.h>
 #include <cstdint>
 
 namespace cyanvne
@@ -12,11 +13,11 @@ namespace cyanvne
 		{
 		private:
 			SDL_IOStream* in_stream_;
-		protected:
+		public:
 			InStreamUniversalImpl(SDL_IOStream* in_stream)
 				: in_stream_(in_stream)
 			{  }
-		public:
+
 			InStreamUniversalImpl(const InStreamUniversalImpl& other) = delete;
             InStreamUniversalImpl(InStreamUniversalImpl&& other) = delete;
             InStreamUniversalImpl& operator=(const InStreamUniversalImpl& other) = delete;
@@ -37,11 +38,11 @@ namespace cyanvne
 		{
 		private:
 			SDL_IOStream* out_stream_;
-		protected:
+		public:
 			OutStreamUniversalImpl(SDL_IOStream* out_stream)
 				: out_stream_(out_stream)
 			{  }
-		public:
+
 			OutStreamUniversalImpl(const OutStreamUniversalImpl& other) = delete;
             OutStreamUniversalImpl(OutStreamUniversalImpl&& other) = delete;
             OutStreamUniversalImpl& operator=(const OutStreamUniversalImpl& other) = delete;

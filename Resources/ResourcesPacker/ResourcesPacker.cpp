@@ -45,6 +45,7 @@ uint64_t cyanvne::resources::ResourcesPacker::addResourceByStream(
 			"Failed to seek to beginning of resource stream.");
 	}
 
+	core::GlobalLogger::getCoreLogger()->info("Adding theme stream resource with alias: " + optional_alias);
 	uint64_t bytes_copied = core::stream::utils::copy_stream_chunked(*resource_stream, *out_stream_);
 
 	ResourceDefinition definition(current_id, optional_alias, bytes_copied, static_cast<uint64_t>(resource_offset), type);
@@ -89,6 +90,8 @@ uint64_t cyanvne::resources::ResourcesPacker::addResourceByString(const std::str
 
 	size_t bytes_to_write = content.length();
 	size_t bytes_written = 0;
+
+	core::GlobalLogger::getCoreLogger()->info("Adding theme string resource with alias: " + optional_alias);
 	if (bytes_to_write > 0)
 	{
 		bytes_written = out_stream_->write(content.data(), bytes_to_write);
@@ -139,6 +142,8 @@ uint64_t cyanvne::resources::ResourcesPacker::addResourceByData(const std::vecto
 			"Failed to get current stream position for resource offset.");
 	}
 
+
+	core::GlobalLogger::getCoreLogger()->info("Adding theme vector resource with alias: " + optional_alias);
 	size_t bytes_to_write = data.size();
 	size_t bytes_written = 0;
 	if (bytes_to_write > 0)
@@ -164,6 +169,9 @@ void cyanvne::resources::ResourcesPacker::finalizePack()
 	{
 		return;
 	}
+
+	core::GlobalLogger::getCoreLogger()->info("Finalizing pack.");
+
 	if (!out_stream_ || !out_stream_->is_open())
 	{
 		throw exception::resourcesexception::ResourcePackerIOException(

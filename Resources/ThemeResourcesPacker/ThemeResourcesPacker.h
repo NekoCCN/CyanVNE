@@ -2,8 +2,7 @@
 #include <Resources/ResourcesPacker/ResourcesPacker.h>
 #include <Parser/ThemeConfig/ThemeConfig.h>
 #include <Core/PathToStream/PathToStream.h>
-
-#include "ThemeResourcesManager/ThemeResourcesManager.h"
+#include <Resources/ThemeResourcesManager/ThemeResourcesManager.h>
 
 namespace cyanvne
 {

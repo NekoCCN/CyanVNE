@@ -3,4 +3,5 @@
 int buf()
 {
 	std::cout << "buf";
+	return 0;
 }

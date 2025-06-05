@@ -1,7 +1,12 @@
 ﻿
 set(CyanVNERuntime_SRC
   "Buffer/Buffer.cpp"
-)
+  "GameStateManager/GameStateManager.h"
+  "GameStateManager/GameStateManager.cpp"
+  "IGameState/IGameState.h"
+  "GuiDebugState/GuiDebugState.h"
+  "GuiDebugState/GuiDebugState.cpp"
+  "RuntimeUtils/RuntimeUtils.h" "RuntimeUtils/RuntimeUtils.cpp" "MainMenuState/MainMenuState.h")
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 

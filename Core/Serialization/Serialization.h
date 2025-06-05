@@ -62,7 +62,7 @@ namespace cyanvne
                 {
                     static_assert(std::is_fundamental_v<T> || std::is_enum_v<T>,
                         "Byte swapping is supported only for primitive types or enumeration types.");
-                    if constexpr (SWAP_BYTES_REQUIRED && sizeof(T) > 1)
+                    if (SWAP_BYTES_REQUIRED && sizeof(T) > 1)
                     {
                         char* bytes = reinterpret_cast<char*>(&val);
                         std::reverse(bytes, bytes + sizeof(T));
