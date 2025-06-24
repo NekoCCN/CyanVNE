@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.15.7)
 
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
@@ -9,7 +9,12 @@ project ("CyanVNE")
 
 if (CMAKE_HOST_WIN32)
   add_compile_definitions( IS_WIN32_SYS )
+  add_compile_definitions ( _CRT_SECURE_NO_WARNINGS )
+  add_compile_definitions(NOMINMAX)
 endif()
+
+# EnTT
+add_subdirectory( "External/entt" )
 
 # Boost
 add_subdirectory( "External/boost" )

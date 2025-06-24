@@ -25,3 +25,6 @@
 [submodule "External/lua-cmake"]
 	path = External/lua-cmake
 	url = https://gitlab.com/codelibre/lua/lua-cmake.git
+[submodule "External/entt"]
+	path = External/entt
+	url = https://github.com/NekoCCN/entt.git
