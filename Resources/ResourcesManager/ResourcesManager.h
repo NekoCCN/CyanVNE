@@ -1,14 +1,12 @@
 #pragma once
 #include <Core/Stream/Stream.h>
 #include <Resources/ResourcesDefination/ResourcesDefination.h>
-#include <Resources/ResourcesException/ResourcesException.h>
 #include <Core/MemoryStreamImpl/MemoryStreamImpl.h>
 #include <vector>
 #include <string>
 #include <map>
 #include <cstdint>
 #include <memory>
-#include <stdexcept>
 
 namespace cyanvne
 {
@@ -18,6 +16,7 @@ namespace cyanvne
         {
         private:
             std::shared_ptr<core::stream::InStreamInterface> in_stream_;
+            mutable std::mutex stream_mutex_;
 
             ResourcesFileHeader file_header_;
             std::vector<ResourceDefinition> definitions_;
@@ -28,10 +27,8 @@ namespace cyanvne
             bool initialized_ = false;
 
             void loadDefinitions();
-
         public:
             explicit ResourcesManager(std::shared_ptr<core::stream::InStreamInterface> stream);
-
             ~ResourcesManager() = default;
 
             ResourcesManager(const ResourcesManager&) = delete;
@@ -39,31 +36,18 @@ namespace cyanvne
             ResourcesManager(ResourcesManager&&) = delete;
             ResourcesManager& operator=(ResourcesManager&&) = delete;
 
-            bool isInitialized() const
-            {
-                return initialized_;
-            }
+            bool isInitialized() const { return initialized_; }
 
             const ResourceDefinition* getDefinitionById(uint64_t id) const;
-
             const ResourceDefinition* getDefinitionByAlias(const std::string& alias) const;
 
             std::vector<uint8_t> getResourceDataById(uint64_t id) const;
-
             std::vector<uint8_t> getResourceDataByAlias(const std::string& alias) const;
 
-            std::shared_ptr<core::stream::FixedSizeMemoryStreamImpl> getResourceAsStreamById(uint64_t id) const;
+            std::shared_ptr<core::stream::InStreamInterface> openResourceStreamById(uint64_t id) const;
+            std::shared_ptr<core::stream::InStreamInterface> openResourceStreamByAlias(const std::string& alias) const;
 
-            std::shared_ptr<core::stream::FixedSizeMemoryStreamImpl> getResourceAsStreamByAlias(const std::string& alias) const;
-
-            const std::vector<ResourceDefinition>& getAllDefinitions() const
-            {
-                if (!initialized_)
-                {
-                    throw exception::IllegalStateException("ResourcesManager not initialized, cannot get definitions.");
-                }
-                return definitions_;
-            }
+            const std::vector<ResourceDefinition>& getAllDefinitions() const;
         };
     }
 }

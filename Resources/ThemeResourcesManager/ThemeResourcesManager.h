@@ -1,38 +1,70 @@
 #pragma once
-#include <Resources/ResourcesManager/ResourcesManager.h>
 #include <Parser/ThemeConfig/ThemeConfig.h>
-#include <Core/Stream/Stream.h>
-#include <Core/MemoryStreamImpl/MemoryStreamImpl.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <memory>
+#include <Resources/ResourcesException/ResourcesException.h>
+#include <variant>
+#include <Resources/CachingResourcesManager/CachingResourcesManager.h>
+
 namespace cyanvne
 {
     namespace resources
     {
         class ThemeResourcesManager
         {
-        private:
-            parser::ThemeConfig cached_theme_config_;
-            std::map<uint64_t, std::vector<uint8_t>> resource_data_cache_;
-            std::vector<ResourceDefinition> definitions_copy_;
-            std::map<uint64_t, uint64_t> id_to_definition_idx_copy_;
-            std::map<std::string, uint64_t> alias_to_id_copy_;
-            bool initialized_ = false;
-            void cacheAllResources(const ResourcesManager& base_manager);
         public:
-            explicit ThemeResourcesManager(const ResourcesManager& manager_to_cache_from)
-                : initialized_(false)
+            using ResourceResult = std::variant<AssetHandle, std::shared_ptr<core::stream::InStreamInterface>>;
+
+        private:
+            std::shared_ptr<ResourcesManager> base_manager_;
+            std::unique_ptr<CachingResourcesManager> caching_manager_;
+            parser::theme::ThemeConfig theme_config_;
+            bool initialized_ = false;
+
+        public:
+            explicit ThemeResourcesManager(
+                const std::shared_ptr<ResourcesManager>& base_manager,
+                size_t max_volatile_size,
+                size_t max_persistent_size,
+                size_t max_single_persistent_size)
             {
-                if (!manager_to_cache_from.isInitialized())
+                if (!base_manager)
                 {
-                    throw exception::resourcesexception::ThemeResourceManagerIOException("Provided ResourcesManager is not initialized.");
+                    throw exception::resourcesexception::ThemeResourceManagerIOException("Provided base ResourcesManager is null.");
                 }
-                cacheAllResources(manager_to_cache_from);
+
+                base_manager_ = base_manager;
+
+                caching_manager_ = std::make_unique<CachingResourcesManager>(
+                    base_manager_,
+                    max_volatile_size,
+                    max_persistent_size,
+                    max_single_persistent_size
+                );
+
+                try
+                {
+                    auto config_handle = caching_manager_->getResource("theme_config");
+                    auto mem_stream = std::make_shared<core::stream::FixedSizeMemoryStreamImpl>(
+                        config_handle.getData().data(),
+                        config_handle.getData().size()
+                    );
+
+                    if (theme_config_.deserialize(*mem_stream) < 0)
+                    {
+                        throw exception::resourcesexception::ThemeResourceManagerIOException("Failed to deserialize ThemeConfig.");
+                    }
+                }
+                catch (const std::exception& e)
+                {
+                    throw exception::resourcesexception::ThemeResourceManagerIOException("Failed to load or parse 'theme_config': " + std::string(e.what()));
+                }
+
+                core::GlobalLogger::getCoreLogger()->info("Theme Caching Config: Max Volatile : {}, Max Persistent : {}, Max Single Persistent : {}, Max Total : {}",
+                    max_volatile_size, max_persistent_size,
+                    max_single_persistent_size, max_persistent_size + max_volatile_size);
+
                 initialized_ = true;
             }
-            ~ThemeResourcesManager() = default;
+
             ThemeResourcesManager(const ThemeResourcesManager&) = delete;
             ThemeResourcesManager& operator=(const ThemeResourcesManager&) = delete;
             ThemeResourcesManager(ThemeResourcesManager&&) = delete;
@@ -42,34 +74,35 @@ namespace cyanvne
             {
                 return initialized_;
             }
-            const parser::ThemeConfig& getThemeConfig() const
+
+            const parser::theme::ThemeConfig& getThemeConfig() const
+            {
+                return theme_config_;
+            }
+
+            ResourceResult getResource(const std::string& alias, bool as_persistent = false) const
             {
                 if (!initialized_)
                 {
-                    throw exception::resourcesexception::ThemeResourceManagerIOException("ThemeResourcesManager not initialized, cannot access ThemeConfig.");
+                    throw exception::resourcesexception::ThemeResourceManagerIOException("ThemeResourcesManager is not initialized.");
                 }
-                return cached_theme_config_;
-            }
-            const ResourceDefinition* getDefinitionById(uint64_t id) const;
 
-            const ResourceDefinition* getDefinitionByAlias(const std::string& alias) const;
-
-            const std::vector<uint8_t>& getResourceDataById(uint64_t id) const;
-
-            const std::vector<uint8_t>& getResourceDataByAlias(const std::string& alias) const;
-
-            std::shared_ptr<core::stream::FixedSizeMemoryStreamImpl> getResourceAsStreamById(uint64_t id) const;
-
-            std::shared_ptr<core::stream::FixedSizeMemoryStreamImpl> getResourceAsStreamByAlias(const std::string& alias) const;
-            
-            const std::vector<ResourceDefinition>& getAllDefinitions() const
-            {
-                if (!initialized_)
+                try
                 {
-                    throw exception::resourcesexception::ThemeResourceManagerIOException("ThemeResourcesManager not initialized, cannot get definitions.");
+                    return caching_manager_->getResource(alias, as_persistent);
                 }
-                return definitions_copy_;
+                catch (const exception::MemoryAllocException&)
+                {
+                    return base_manager_->openResourceStreamByAlias(alias);
+                }
             }
+
+            std::vector<uint8_t> getResourceData(const std::string& alias) const
+            {
+                return base_manager_->getResourceDataByAlias(alias);
+            }
+
+            ~ThemeResourcesManager() = default;
         };
     }
 }
