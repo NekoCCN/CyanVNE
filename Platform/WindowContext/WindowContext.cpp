@@ -17,12 +17,13 @@ platform::WindowContext::WindowContext(const char* title, uint32_t width, uint32
 	// renderer part
 	drive_num_ = SDL_GetNumRenderDrivers();
 	core::GlobalLogger::getCoreLogger()->info("Supported Graphic API List: ");
-	for (int i = 0; i < drive_num_; ++i)
-	{
-		render_drive_str_.emplace_back(SDL_GetRenderDriver(i));
-		core::GlobalLogger::getCoreLogger()->info(render_drive_str_[i].c_str());
-	}
+	render_drive_str_ = std::views::iota(0, drive_num_) |
+		std::views::transform([](int i) { return std::string(SDL_GetRenderDriver(i)); }) |
+		std::views::transform([](const std::string& str)
+			{ core::GlobalLogger::getCoreLogger()->info(str); return str; }) |
+		std::ranges::to<std::vector<std::string>>();	
 	core::GlobalLogger::getCoreLogger()->info("END");
+
 	sdl_renderer_ = SDL_CreateRenderer(window_, drive);
 	if (sdl_renderer_ == nullptr)
 	{

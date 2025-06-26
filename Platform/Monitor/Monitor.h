@@ -63,6 +63,21 @@ namespace cyanvne
 				}
 				return tmp;
 			}
+
+			std::vector<SDL_Rect> getVaildMonitorBounds() const
+			{
+				std::vector<SDL_Rect> tmp;
+				SDL_Rect bounds;
+				for (int i = 0; i < monitor_num_; i++)
+				{
+					SDL_GetDisplayBounds(i, &bounds);
+					if (bounds.w > 0 && bounds.h > 0)
+					{
+                        tmp.emplace_back(bounds);
+					}
+				}
+				return tmp;
+			}
 		};
 	}
 }

@@ -4,6 +4,7 @@
 #include <Core/Logger/Logger.h>
 #include <string>
 #include <vector>
+#include <ranges>
 
 namespace cyanvne
 {
@@ -69,7 +70,7 @@ namespace cyanvne
 			{
 				return window_;
 			}
-			bool setRenderVSync(int32_t vsync) const
+			[[nodiscard]] bool setRenderVSync(int32_t vsync) const
 			{
 				if (!SDL_SetRenderVSync(sdl_renderer_, vsync))
 				{
@@ -86,14 +87,14 @@ namespace cyanvne
 			{
 				return (SDL_GetWindowFlags(window_) & SDL_WINDOW_MINIMIZED);
 			}
-			bool setRenderDrawColorInt(uint8_t r, uint8_t g, uint8_t b, uint8_t a) const
+			[[nodiscard]] bool setRenderDrawColorInt(uint8_t r, uint8_t g, uint8_t b, uint8_t a) const
 			{
 				if (SDL_SetRenderDrawColor(sdl_renderer_, r, g, b, a))
 					return true;
 				return false;
 			}
 
-			bool setRenderDrawColorFloat(float r, float g, float b, float a) const
+			[[nodiscard]] bool setRenderDrawColorFloat(float r, float g, float b, float a) const
 			{
 				if (SDL_SetRenderDrawColorFloat(sdl_renderer_, r, g, b, a))
 					return true;

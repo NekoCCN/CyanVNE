@@ -7,8 +7,9 @@ target_link_libraries (CyanVNE
   CyanVNEParser
   CyanVNEResources
   CyanVNERuntime
+  EnTT::EnTT
   )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET CyanVNE PROPERTY CXX_STANDARD 20)
+  set_property(TARGET CyanVNE PROPERTY CXX_STANDARD 23)
 endif()

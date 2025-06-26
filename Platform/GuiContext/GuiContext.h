@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <memory>
 #include <mutex>
+#include <set>
 
 namespace cyanvne
 {
@@ -21,8 +22,8 @@ namespace cyanvne
         class GuiContext : public basicrender::IChangeableWindowSize
         {
         private:
-            static std::mutex _mutex;
-            static volatile GuiContext* _instance;
+            inline static std::mutex _mutex;
+            inline static volatile GuiContext* _instance;
 
             ImGuiIO* io;
 
@@ -47,31 +48,34 @@ namespace cyanvne
                 constexpr float max_scale = 2.0f;
                 return std::clamp(final_scale, min_scale, max_scale);
             }
-            GuiContext(const std::shared_ptr<WindowContext>& window, const std::shared_ptr<char>& font_data = nullptr,
-                uint64_t font_size = 0, float size_pixels = 30.0f, float scale = 1.0f,
-                std::vector<std::string> extra_languages_support = {});
+            GuiContext(const std::shared_ptr<WindowContext>& window,
+                const std::vector<uint8_t>& font_data = {},
+                float size_pixels = 30.0f,
+                const std::set<std::string>& extra_languages_support = {});
         public:
             GuiContext(const GuiContext&) = delete;
             GuiContext& operator=(const GuiContext&) = delete;
             GuiContext(GuiContext&&) = delete;
             GuiContext& operator=(GuiContext&&) = delete;
 
-            static std::shared_ptr<GuiContext> create(const std::shared_ptr<WindowContext>& window, const std::shared_ptr<char>& font_data = nullptr,
-                uint64_t font_size = 0, float size_pixels = 30.0f, float scale = 1.0f)
+            static std::shared_ptr<GuiContext> create(const std::shared_ptr<WindowContext>& window,
+                const std::vector<uint8_t>& font_data = {},
+                float size_pixels = 30.0f,
+                const std::set<std::string>& extra_languages_support = {})
             {
-                if (window == nullptr)
+                if (_instance == nullptr)
                 {
                     _mutex.lock();
                     if (_instance == nullptr)
                     {
-                        _instance = new GuiContext(window, font_data, font_size, size_pixels, scale);
+                        _instance = new GuiContext(window, font_data, size_pixels, extra_languages_support);
                     }
                     _mutex.unlock();
                 }
                 return std::shared_ptr<GuiContext>(const_cast<GuiContext*>(_instance));
             }
 
-            void response(SDL_Event* event)
+            static void response(const SDL_Event* event)
             {
                 ImGui_ImplSDL3_ProcessEvent(event);
             }
@@ -81,14 +85,31 @@ namespace cyanvne
                 return *io;
             }
 
-            void setupImGuiStyle(bool bStyleDark_, float alpha_)
+            void setupImGuiStyle(bool dark_style, float alpha)
             {
+                ImGuiStyle& style = ImGui::GetStyle();
+                [[maybe_unused]] ImVec4* colors = style.Colors;
 
+                style.WindowPadding.x = 14.0f;
+                style.WindowPadding.y = 14.0f;
+                style.FramePadding.x = 10.0f;
+                style.FramePadding.y = 5.0f;
+                style.ItemSpacing.x = 14.0f;
+                style.ItemSpacing.y = 5.0f;
+                style.ScrollbarSize = 16;
+                style.GrabMinSize = 10.0f;
+
+                style.WindowRounding = 12.0f;
+                style.FrameRounding = 8.0f;
+                style.ChildRounding = 12.0f;
+                style.PopupRounding = 12.0f;
+                style.ScrollbarRounding = 18.0f;
             }
 
             void whenChangedWindowSize(int new_w, int new_h) override
             {
-                ImGui::GetIO().FontGlobalScale = calculateScreenScale(static_cast<float>(new_w), static_cast<float>(new_h), font_pixels_size_);
+                ImGui::GetIO().FontGlobalScale = calculateScreenScale(static_cast<float>(new_w),
+                    static_cast<float>(new_h), font_pixels_size_);
             }
 
             ~GuiContext() override

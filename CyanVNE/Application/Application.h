@@ -3,10 +3,10 @@
 #include <Platform/WindowContext/WindowContext.h>
 #include <Platform/GuiContext/GuiContext.h>
 #include <Parser/AppSettings/AppSettings.h>
+#include <Parser/ParserFactories/ParserFactories.h>
 #include <Platform/EventBus/EventBus.h>
 #include <Platform/Monitor/Monitor.h>
 #include <Core/PathToStream/PathToStream.h>
-#include <algorithm>
 #include <memory>
 #include <string>
 #include <Core/Stream/Stream.h>
@@ -40,11 +40,9 @@ namespace cyanvne
 		{
 			if (in_stream)
 			{
-				cyanvne::parser::appsettings::AppSettingsParser app_settings_parser;
 				try
 				{
-					app_settings_parser.parse(in_stream);
-					app_settings_ = app_settings_parser.get();
+					app_settings_ = parser::factories::loadAppSettingsFromStream(*in_stream);
 				}
 				catch (const std::exception& e)
 				{
@@ -58,8 +56,8 @@ namespace cyanvne
 					"AppSettings file is not found, Use default app settings" , nullptr);
 			}
 
-			core::GlobalLogger::initUniversalCoreLogger(app_settings_.logger_config_);
-			core::GlobalLogger::initUniversalClientLogger(app_settings_.logger_config_);
+			core::GlobalLogger::initUniversalCoreLogger(app_settings_.logger);
+			core::GlobalLogger::initUniversalClientLogger(app_settings_.logger);
 
 			core::GlobalLogger::getCoreLogger()->info("CyanVNE is starting...");
 
@@ -76,7 +74,7 @@ namespace cyanvne
 
 			try
 			{
-				if (app_settings_.is_ratio_window)
+				if (app_settings_.window.is_ratio_window)
 				{
 					platform::MonitorLists monitors;
 					if (monitors.getMonitorNum() < 1)
@@ -97,9 +95,9 @@ namespace cyanvne
 				else
 				{
 					core::GlobalLogger::getCoreLogger()->info("Create Window using the size specified in the configuration file {:d} x {:d}",
-						app_settings_.window_width, app_settings_.window_height);
+						app_settings_.window.width, app_settings_.window.height);
 					window_context_ = std::make_shared<platform::WindowContext>(
-						app_settings_.title.c_str(), app_settings_.window_width, app_settings_.window_height);
+						app_settings_.title.c_str(), app_settings_.window.width, app_settings_.window.height);
 				}
 				window_context_->setRenderVSync(1);
 			}
@@ -124,7 +122,11 @@ namespace cyanvne
 			{
 				std::shared_ptr<resources::ResourcesManager> theme_resources_manager =
 					std::make_shared<resources::ResourcesManager>(theme_resources_stream);
-				theme_resources_ = std::make_shared<resources::ThemeResourcesManager>(*theme_resources_manager);
+				theme_resources_ = std::make_shared<resources::ThemeResourcesManager>(theme_resources_manager,
+					app_settings_.caching.theme_caching_config.max_volatile_size,
+					app_settings_.caching.theme_caching_config.max_persistent_size,
+					app_settings_.caching.theme_caching_config.max_single_persistent_size
+				);
 			}
 			catch (const exception::resourcesexception::ResourceManagerIOException& e)
 			{
@@ -146,9 +148,12 @@ namespace cyanvne
                 return;
             }
 
-			gui_context_ = app_settings_.enable_extra_languages_support ? platform::GuiContext::create(window_context_,
-					               theme_resources_->getResourceDataByAlias("built_in_font"), 30, app_settings_.extra_languages_support) : platform::GuiContext::create(window_context_,
-					               theme_resources_->getResourceDataByAlias("built_in_font"), 30);
+			gui_context_ = app_settings_.languages.is_enabled ?
+				platform::GuiContext::create(window_context_,
+					               theme_resources_->getResourceData("built_in_font"), 30, app_settings_.languages.supported_languages)
+				:
+				platform::GuiContext::create(window_context_,
+					               theme_resources_->getResourceData("built_in_font"), 30);
 
 			event_bus_ = std::make_shared<platform::EventBus>();
 
@@ -159,7 +164,7 @@ namespace cyanvne
 			is_initialized_ = true;
 		}
 
-		int start()
+		int start() const
 		{
 			if (!is_initialized_)
 			{
@@ -176,7 +181,7 @@ namespace cyanvne
 				Uint64 current_time = SDL_GetTicks();
 				float delta_time = (current_time - last_time) / 1000.0f;
 
-				delta_time = min(delta_time, 0.1f);
+				delta_time = std::min(delta_time, 0.1f);
 
 				last_time = current_time;
 

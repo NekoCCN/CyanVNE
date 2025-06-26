@@ -1,5 +1,6 @@
 #pragma execution_character_set("utf-8")
 #include "Monitor.h"
+#include <ranges>
 
 // Notice Exception Handling
 SDL_Rect cyanvne::platform::MonitorLists::getDisplayBound(int32_t index) const
@@ -23,10 +24,12 @@ void cyanvne::platform::MonitorLists::getDisplayBound(int32_t index, SDL_Rect* p
 }
 std::vector<std::string> cyanvne::platform::MonitorLists::getMonitorNameList() const
 {
-	std::vector<std::string> tmp;
-	for (int i = 0; i < monitor_num_; ++i)
-		tmp.emplace_back(SDL_GetDisplayName(monitor_list_[i]));
-	return tmp;
+	// 0 - (monitor_num_ - 1)
+	return std::views::iota(0, monitor_num_) | std::views::transform([this](int i)
+		{
+			return std::string(SDL_GetDisplayName(monitor_list_[i]));
+		}) | std::ranges::to<std::vector>();
+
 }
 // Notice Exception Handling
 SDL_DisplayID cyanvne::platform::MonitorLists::operator[](int index) const

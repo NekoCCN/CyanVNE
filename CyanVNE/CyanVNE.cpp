@@ -4,9 +4,12 @@
 #include <Resources/ThemeResourcesPacker/ThemeResourcesPacker.h>
 #include <Parser/ThemeConfigParser/ThemeConfigParser.h>
 #include <Core/Stream/Stream.h>
+#include <entt/entt.hpp>
 
 int main()
 {
+	entt::registry registry;
+
 	std::shared_ptr<cyanvne::resources::UniversalPathToStream> path_to_stream =
 		std::make_shared<cyanvne::resources::UniversalPathToStream>();
 
@@ -15,13 +18,10 @@ int main()
 	//try {
 	//	std::shared_ptr<cyanvne::core::stream::InStreamInterface> theme_generator_packer =
 	//		path_to_stream->getInStream(R"(E:\CyanVNE-TestProject\MiniThemeGeneratorSetting.yaml)");
-	//	cyanvne::parser::theme::ThemeConfigParser theme_parser;
-	//	theme_parser.parse(theme_generator_packer);
-	//	cyanvne::parser::theme::ThemeGeneratorConfigParser theme_generator_parser;
-	//	theme_generator_parser.parse(theme_generator_packer);
 
 	//	cyanvne::resources::ThemeResourcesPacker theme_packer(path_to_stream, R"(E:\CyanVNE-TestProject\MiniTheme.cyantr)");
-	//	theme_packer.packThemeEntire(theme_parser.get(), theme_generator_parser.get());
+	//	theme_packer.packThemeEntire(cyanvne::parser::factories::loadThemeConfigFromStream(*theme_generator_packer)
+	//	, cyanvne::parser::factories::loadThemeGeneratorConfigFromStream(*theme_generator_packer));
 	//	theme_packer.finalizePack();
 	//}
 	//catch (cyanvne::exception::parserexception::ParserException& e)

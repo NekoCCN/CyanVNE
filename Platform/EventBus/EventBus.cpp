@@ -1,6 +1,6 @@
 #include "EventBus.h"
-
-#include "backends/imgui_impl_sdl3.h"
+#include <numeric>
+#include <backends/imgui_impl_sdl3.h>
 
 namespace cyanvne
 {
@@ -154,7 +154,8 @@ namespace cyanvne
                     {
                         --sdl_wildcard_subscriber_count_;
                     }
-                    else {
+                    else
+                    {
                         core::GlobalLogger::getCoreLogger()->warn("EventBus: Wildcard count already zero before decrement.");
                     }
                 }
@@ -170,7 +171,7 @@ namespace cyanvne
         {
             if (!callback)
             {
-                return {};
+                return {  };
             }
             uint64_t id = next_subscription_id_++;
             auto wrapper = std::make_shared<SDLCallbackWrapper>(std::move(callback), id, specific_event_type);
@@ -294,6 +295,7 @@ namespace cyanvne
                         task_ptr->dispatch_function();
                     }
                     std::lock_guard<std::mutex> lock(task_pool_mutex_);
+
                     task_pool_.destroy(task_ptr);
                 }
             }
@@ -302,24 +304,27 @@ namespace cyanvne
         size_t EventBus::getSDLSubscriberCount(SDL_EventType specific_event_type) const
         {
             std::lock_guard<std::mutex> lock(listeners_mutex_);
+
             if (specific_event_type == static_cast<SDL_EventType>(0))
             {
                 return sdl_wildcard_subscriber_count_.load(std::memory_order_relaxed);
             }
-            auto it = sdl_event_type_subscriber_counts_.find(specific_event_type);
+            const auto it = sdl_event_type_subscriber_counts_.find(specific_event_type);
+
             return (it != sdl_event_type_subscriber_counts_.end()) ? it->second.load(std::memory_order_relaxed) : 0;
         }
 
         size_t EventBus::getTotalSubscriberCount() const
         {
-            size_t total = 0;
             std::lock_guard<std::mutex> lock(listeners_mutex_);
-            for (const auto& val : generic_listeners_ | std::views::values)
-            {
-                total += val.size();
-            }
-            total += sdl_listeners_.size();
-            return total;
+
+            auto size_stream = generic_listeners_ | std::views::values |
+                std::views::transform([](const std::vector<std::shared_ptr<ICallbackWrapper>>& vec)
+                    { return vec.size(); });
+
+            return std::accumulate(size_stream.begin(),
+                size_stream.end(),
+                sdl_listeners_.size());
         }
     }
 }
