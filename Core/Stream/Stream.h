@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <memory>
+#include <mutex>
 
 namespace cyanvne
 {
@@ -66,6 +68,50 @@ namespace cyanvne
 
                 ~StreamInterface() override = default;
 			};
+
+            class SubStream : public core::stream::InStreamInterface
+            {
+            private:
+                std::shared_ptr<core::stream::InStreamInterface> parent_stream_;
+                std::mutex& parent_stream_mutex_;
+
+                uint64_t resource_offset_;
+                uint64_t resource_size_;
+                uint64_t current_position_;
+
+            public:
+                SubStream(std::shared_ptr<core::stream::InStreamInterface> parent, std::mutex& shared_mutex, uint64_t offset, uint64_t size)
+                    : parent_stream_(std::move(parent)),
+                    parent_stream_mutex_(shared_mutex),
+                    resource_offset_(offset),
+                    resource_size_(size),
+                    current_position_(0)
+                {  }
+
+                SubStream(const SubStream&) = delete;
+                SubStream& operator=(const SubStream&) = delete;
+                SubStream(SubStream&&) = delete;
+                SubStream& operator=(SubStream&&) = delete;
+                ~SubStream() override = default;
+
+                size_t read(void* buffer, size_t size_to_read) override;
+                int64_t seek(int64_t offset, core::stream::SeekMode mode) override;
+
+                int64_t tell() override
+                {
+                    return static_cast<int64_t>(current_position_);
+                }
+
+                bool is_open() override
+                {
+                    return parent_stream_ && parent_stream_->is_open();
+                }
+
+                uint64_t size() const
+                {
+                    return resource_size_;
+                }
+            };
 
 			namespace utils
 			{

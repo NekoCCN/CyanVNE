@@ -24,5 +24,5 @@ set(CyanVNECore_Require
 target_link_libraries(CyanVNECore PUBLIC ${CyanVNECore_Require})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET CyanVNECore PROPERTY CXX_STANDARD 20)
+  set_property(TARGET CyanVNECore PROPERTY CXX_STANDARD 23)
 endif()

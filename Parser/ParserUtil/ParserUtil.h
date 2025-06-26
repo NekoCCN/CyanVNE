@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <variant>
 
 namespace cyanvne
 {
@@ -12,7 +13,19 @@ namespace cyanvne
     {
         namespace util
         {
-            const YAML::Node& getYamlNodeElseThrow(const YAML::Node& node, const std::string& key,
+            typedef std::variant<bool, YAML::Node> NodeOrBool;
+
+            NodeOrBool getYamlNodeOrBool(const YAML::Node& node, const std::string& key,
+                const std::string& parser_name);
+
+            NodeOrBool getYamlNodeOrFalse(const YAML::Node& node, const std::string& key,
+                const std::string& parser_name);
+
+            bool checkIsBoolFalse(const YAML::Node& node, const std::string& parser_name);
+
+            bool checkIsBoolFalseIfTrueThrow(const YAML::Node& node, const std::string& parser_name);
+
+            YAML::Node getYamlNodeElseThrow(const YAML::Node& node, const std::string& key,
                 const std::string& parser_name);
 
             std::vector<YAML::Node> getSequenceAsNodeVectorElseThrow(const YAML::Node& parent_node, const std::string& key,

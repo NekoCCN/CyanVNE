@@ -5,6 +5,7 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <optional>
 #include <list>
 #include <type_traits>
 #include <cstddef>
@@ -23,10 +24,10 @@ namespace cyanvne
             protected:
                 BinarySerialiable() = default;
             public:
-                BinarySerialiable(const BinarySerialiable&) = delete;
-                BinarySerialiable& operator=(const BinarySerialiable&) = delete;
-                BinarySerialiable(BinarySerialiable&&) = delete;
-                BinarySerialiable& operator=(BinarySerialiable&&) = delete;
+                BinarySerialiable(const BinarySerialiable&) = default;
+                BinarySerialiable& operator=(const BinarySerialiable&) = default;
+                BinarySerialiable(BinarySerialiable&&) = default;
+                BinarySerialiable& operator=(BinarySerialiable&&) = default;
 
                 virtual std::ptrdiff_t serialize(cyanvne::core::stream::OutStreamInterface& out) const = 0;
                 virtual std::ptrdiff_t deserialize(cyanvne::core::stream::InStreamInterface& in) = 0;
@@ -123,6 +124,12 @@ namespace cyanvne
             {  };
             template <typename Elem, typename Alloc> struct is_std_list<std::list<Elem, Alloc>> : std::true_type {};
             template <typename T> constexpr bool is_std_list_v = is_std_list<std::decay_t<T>>::value;
+
+            template <typename T> struct is_std_optional : std::false_type
+            {  };
+            template <typename T> struct is_std_optional<std::optional<T>> : std::true_type
+            {  };
+            template <typename T> constexpr bool is_std_optional_v = is_std_optional<std::decay_t<T>>::value;
 
 
             template <typename T>
@@ -231,6 +238,26 @@ namespace cyanvne
                     }
                     return total_bytes_written;
                 }
+                else if constexpr (is_std_optional_v<StrippedT>)
+                {
+                    bool has_value = value.has_value();
+
+                    bytes_written = serialize_object(out, has_value);
+
+                    if (bytes_written == -1)
+                    {
+                        return -1;
+                    }
+                    total_bytes_written += bytes_written;
+
+                    if (has_value)
+                    {
+                        bytes_written = serialize_object(out, *value);
+                        if (bytes_written == -1) return -1;
+                        total_bytes_written += bytes_written;
+                    }
+                    return total_bytes_written;
+                }
                 else
                 {
                     static_assert(std::is_base_of_v<BinarySerialiable, StrippedT> ||
@@ -240,7 +267,7 @@ namespace cyanvne
                         is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT> ||
                         is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>,
                         "BinarySerializer: Unsupported type for serialize_object. "
-                        "Type must be fundamental, std::string, std::vector, std::list, std::map, std::set, std::unordered_map, std::unordered_set, "
+                        "Type must be fundamental, std::string, a supported std:: container (vector, map, optional, etc.), "
                         "or implement the BinarySerialiable interface.");
                     return -1;
                 }
@@ -413,6 +440,35 @@ namespace cyanvne
                     }
                     return total_bytes_read;
                 }
+                else if constexpr (is_std_optional_v<StrippedT>)
+                {
+                    bool has_value;
+
+                    bytes_read = deserialize_object(in, has_value);
+
+                    if (bytes_read == -1)
+                    {
+                        return -1;
+                    }
+                    total_bytes_read += bytes_read;
+
+                    if (has_value)
+                    {
+                        value.emplace();
+                        bytes_read = deserialize_object(in, *value);
+                        if (bytes_read == -1)
+                        {
+                            value.reset();
+                            return -1;
+                        }
+                        total_bytes_read += bytes_read;
+                    }
+                    else
+                    {
+                        value.reset();
+                    }
+                    return total_bytes_read;
+                    }
                 else
                 {
                     static_assert(std::is_base_of_v<BinarySerialiable, StrippedT> ||
@@ -422,7 +478,7 @@ namespace cyanvne
                         is_std_map_v<StrippedT> || is_std_unordered_map_v<StrippedT> ||
                         is_std_set_v<StrippedT> || is_std_unordered_set_v<StrippedT>,
                         "BinarySerializer: Unsupported type for deserialize_object. "
-                        "Type must be fundamental, std::string, std::vector, std::list, std::map, std::set, std::unordered_map, std::unordered_set, "
+                        "Type must be fundamental, std::string, a supported std:: container (vector, map, optional, etc.), "
                         "or implement the BinarySerialiable interface.");
                     return -1;
                 }
