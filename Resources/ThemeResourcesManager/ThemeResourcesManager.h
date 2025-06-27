@@ -1,8 +1,7 @@
 #pragma once
-#include <Parser/ThemeConfig/ThemeConfig.h>
-#include <Resources/ResourcesException/ResourcesException.h>
 #include <variant>
-#include <Resources/CachingResourcesManager/CachingResourcesManager.h>
+#include <Resources/UnifiedCacheManager/UnifiedCacheManager.h>
+#include <Resources/ICacheResourcesManager/ICacheResourcesManager.h>
 
 namespace cyanvne
 {
@@ -10,60 +9,51 @@ namespace cyanvne
     {
         class ThemeResourcesManager
         {
-        public:
-            using ResourceResult = std::variant<AssetHandle, std::shared_ptr<core::stream::InStreamInterface>>;
-
         private:
             std::shared_ptr<ResourcesManager> base_manager_;
-            std::unique_ptr<CachingResourcesManager> caching_manager_;
+            std::shared_ptr<UnifiedCacheManager> cache_manager_;
             parser::theme::ThemeConfig theme_config_;
             bool initialized_ = false;
 
         public:
             explicit ThemeResourcesManager(
                 const std::shared_ptr<ResourcesManager>& base_manager,
-                size_t max_volatile_size,
-                size_t max_persistent_size,
-                size_t max_single_persistent_size)
+                uint64_t max_volatile_size, SDL_Renderer* renderer): base_manager_(base_manager)
             {
-                if (!base_manager)
-                {
-                    throw exception::resourcesexception::ThemeResourceManagerIOException("Provided base ResourcesManager is null.");
-                }
+	            if (!base_manager || !base_manager->isInitialized())
+	            {
+		            throw exception::resourcesexception::ResourceManagerIOException("Provided base ResourcesManager is null or not initialized.");
+	            }
 
-                base_manager_ = base_manager;
+                cache_manager_ = std::make_shared<UnifiedCacheManager>(base_manager, renderer, max_volatile_size);
+	            if (!cache_manager_)
+	            {
+		            throw exception::resourcesexception::ResourceManagerIOException("Provided UnifiedCacheManager is null.");
+	            }
 
-                caching_manager_ = std::make_unique<CachingResourcesManager>(
-                    base_manager_,
-                    max_volatile_size,
-                    max_persistent_size,
-                    max_single_persistent_size
-                );
+	            try
+	            {
+		            DataHandle config_handle = cache_manager_->get<RawDataResource>("theme_config");
 
-                try
-                {
-                    auto config_handle = caching_manager_->getResource("theme_config");
-                    auto mem_stream = std::make_shared<core::stream::FixedSizeMemoryStreamImpl>(
-                        config_handle.getData().data(),
-                        config_handle.getData().size()
-                    );
+		            auto mem_stream = std::make_shared<core::stream::FixedSizeMemoryStreamImpl>(
+			            config_handle->data.data(),
+			            config_handle->data.size()
+		            );
 
-                    if (theme_config_.deserialize(*mem_stream) < 0)
-                    {
-                        throw exception::resourcesexception::ThemeResourceManagerIOException("Failed to deserialize ThemeConfig.");
-                    }
-                }
-                catch (const std::exception& e)
-                {
-                    throw exception::resourcesexception::ThemeResourceManagerIOException("Failed to load or parse 'theme_config': " + std::string(e.what()));
-                }
+		            if (theme_config_.deserialize(*mem_stream) < 0)
+		            {
+			            throw exception::resourcesexception::ResourceManagerIOException("Failed to deserialize ThemeConfig.");
+		            }
+	            }
+	            catch (const std::exception& e)
+	            {
+		            throw exception::resourcesexception::ResourceManagerIOException("Failed to load or parse 'theme_config': " + std::string(e.what()));
+	            }
 
-                core::GlobalLogger::getCoreLogger()->info("Theme Caching Config: Max Volatile : {}, Max Persistent : {}, Max Single Persistent : {}, Max Total : {}",
-                    max_volatile_size, max_persistent_size,
-                    max_single_persistent_size, max_persistent_size + max_volatile_size);
-
-                initialized_ = true;
+	            initialized_ = true;
             }
+
+            ~ThemeResourcesManager() = default;
 
             ThemeResourcesManager(const ThemeResourcesManager&) = delete;
             ThemeResourcesManager& operator=(const ThemeResourcesManager&) = delete;
@@ -77,32 +67,78 @@ namespace cyanvne
 
             const parser::theme::ThemeConfig& getThemeConfig() const
             {
+                if (!initialized_)
+                {
+                    throw exception::resourcesexception::ResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                }
                 return theme_config_;
             }
 
-            ResourceResult getResource(const std::string& alias, bool as_persistent = false) const
+            TextureHandle getTexture(const std::string& alias) const
+            {
+                if (!initialized_) throw exception::resourcesexception::ResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                return cache_manager_->get<TextureResource>(alias);
+            }
+
+            DataHandle getData(const std::string& alias) const
+            {
+                if (!initialized_) throw exception::resourcesexception::ResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                return cache_manager_->get<RawDataResource>(alias);
+            }
+
+            SoundHandle getSound(const std::string& alias) const
+            {
+                if (!initialized_) throw exception::resourcesexception::ResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                return cache_manager_->get<SoLoudWavResource>(alias);
+            }
+
+            std::variant<SoundHandle, StreamHandle> getSoundOrStream(const std::string& alias) const
             {
                 if (!initialized_)
                 {
-                    throw exception::resourcesexception::ThemeResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                    throw exception::resourcesexception::ResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                }
+
+                if (base_manager_->getDefinitionByAlias(alias)->size * 3 > cache_manager_->getMaxCacheBufferSize())
+                {
+                    core::GlobalLogger::getCoreLogger()->warn("Resource '{}' likely too large for cache, falling back to streaming.", alias);
+                    return base_manager_->openResourceStreamByAlias(alias);
                 }
 
                 try
                 {
-                    return caching_manager_->getResource(alias, as_persistent);
+                    return cache_manager_->get<SoLoudWavResource>(alias);
                 }
-                catch (const exception::MemoryAllocException&)
+                catch (const exception::MemoryAllocException& e)
                 {
+                    core::GlobalLogger::getCoreLogger()->warn("Resource '{}' likely too large for cache, falling back to streaming. Reason: {}", alias, e.what());
                     return base_manager_->openResourceStreamByAlias(alias);
                 }
             }
 
-            std::vector<uint8_t> getResourceData(const std::string& alias) const
+            std::variant<DataHandle, StreamHandle> getDataOrStream(const std::string& alias) const
             {
-                return base_manager_->getResourceDataByAlias(alias);
-            }
+                if (!initialized_)
+                {
+                    throw exception::resourcesexception::ResourceManagerIOException("ThemeResourcesManager is not initialized.");
+                }
 
-            ~ThemeResourcesManager() = default;
+                if (base_manager_->getDefinitionByAlias(alias)->size * 3 > cache_manager_->getMaxCacheBufferSize())
+                {
+                    core::GlobalLogger::getCoreLogger()->warn("Resource '{}' likely too large for cache, falling back to streaming.", alias);
+                    return base_manager_->openResourceStreamByAlias(alias);
+                }
+
+                try
+                {
+                    return cache_manager_->get<RawDataResource>(alias);
+                }
+                catch (const exception::MemoryAllocException& e)
+                {
+                    core::GlobalLogger::getCoreLogger()->warn("Resource '{}' likely too large for cache, falling back to streaming. Reason: {}", alias, e.what());
+                    return base_manager_->openResourceStreamByAlias(alias);
+                }
+            }
         };
     }
 }

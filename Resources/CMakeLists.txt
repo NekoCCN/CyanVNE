@@ -17,9 +17,11 @@ set(CyanVNEResources_SRC
   "ThemeResourcesManager/ThemeResourcesManager.h"
   "Adapters/SdlIoStreamAdapter.h"
   "Adapters/SdlIoStreamAdapter.cpp"
-  "CachingResourcesManager/CachingResourcesManager.h"
-  "CachingResourcesManager/CachingResourcesManager.cpp"
-)
+  "UnifiedCacheManager/UnifiedCacheManager.h"
+  "UnifiedCacheManager/UnifiedCacheManager.cpp"
+ "ICachedResource/ICachedResource.h"
+ "ResourceTypes/ResourceTypes.h"
+ "ResourceTypes/ResourceType.cpp" "ICacheResourcesManager/ICacheResourcesManager.h")
 
 add_library(CyanVNEResources STATIC ${CyanVNEResources_SRC})
 
