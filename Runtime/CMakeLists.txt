@@ -5,7 +5,15 @@ set(CyanVNERuntime_SRC
   "IGameState/IGameState.h"
   "GuiDebugState/GuiDebugState.h"
   "GuiDebugState/GuiDebugState.cpp"
-  "RuntimeUtils/RuntimeUtils.h" "RuntimeUtils/RuntimeUtils.cpp" "MainMenuState/MainMenuState.h" "Components/Components.h" "Scene/Scene.h")
+  "RuntimeUtils/RuntimeUtils.h"
+  "RuntimeUtils/RuntimeUtils.cpp"
+  "MainMenuState/MainMenuState.h"
+  "Components/Components.h"
+  "Scene/Scene.h"
+  "Systems/Systems.h"
+  "Systems/Systems.cpp"
+  "Scene/Scene.cpp"
+ "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h")
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 

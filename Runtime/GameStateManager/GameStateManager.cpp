@@ -1,69 +1,90 @@
 #include "GameStateManager.h"
-#include <Core/Logger/Logger.h>
+#include <Runtime/IGameState/IGameState.h>
 
-cyanvne::runtime::GameStateManager::~GameStateManager()
+namespace cyanvne::runtime
 {
-    core::GlobalLogger::getCoreLogger()->info("GameStateManager destroyed.");
-    while (!state_stack_.empty())
+    GameStateManager::GameStateManager(std::shared_ptr<platform::WindowContext> window_ctx, std::shared_ptr<platform::EventBus> event_bus)
+        : window_context_(std::move(window_ctx)), event_bus_(std::move(event_bus))
     {
-        state_stack_.back()->shutdown(*this);
-        state_stack_.pop_back();
+        state_stack_.reserve(10);
     }
-}
 
-void cyanvne::runtime::GameStateManager::pushState(std::unique_ptr<IGameState> new_state)
-{
-    if (!new_state)
+    GameStateManager::~GameStateManager()
     {
-        return;
+        while (!state_stack_.empty())
+        {
+            state_stack_.back()->shutdown(*this);
+            state_stack_.pop_back();
+        }
     }
-    if (!state_stack_.empty())
+    
+    void GameStateManager::quit()
     {
-        state_stack_.back()->pause(*this);
+        running_ = false;
     }
-    new_state->init(*this);
-    state_stack_.push_back(std::move(new_state));
-}
 
-void cyanvne::runtime::GameStateManager::popState()
-{
-    if (!state_stack_.empty())
+    void GameStateManager::pushState(std::unique_ptr<IGameState> new_state)
     {
-        state_stack_.back()->shutdown(*this);
-        state_stack_.pop_back();
+        if (!new_state)
+            return;
 
         if (!state_stack_.empty())
         {
-            state_stack_.back()->resume(*this);
+            state_stack_.back()->pause(*this);
+        }
+
+        new_state->init(*this);
+
+        state_stack_.push_back(std::move(new_state));
+    }
+
+    void GameStateManager::popState()
+    {
+        if (!state_stack_.empty())
+        {
+            state_stack_.back()->shutdown(*this);
+
+            state_stack_.pop_back();
+
+            if (!state_stack_.empty())
+            {
+                state_stack_.back()->resume(*this);
+            }
         }
     }
-}
 
-void cyanvne::runtime::GameStateManager::changeState(std::unique_ptr<IGameState> new_state)
-{
-    while (!state_stack_.empty())
+    void GameStateManager::changeState(std::unique_ptr<IGameState> new_state)
     {
-        state_stack_.back()->shutdown(*this);
-        state_stack_.pop_back();
-    }
-    pushState(std::move(new_state));
-}
-
-void cyanvne::runtime::GameStateManager::updateCurrentState(float deltaTime)
-{
-    if (!state_stack_.empty())
-    {
-        state_stack_.back()->update(*this, deltaTime);
-    }
-}
-
-void cyanvne::runtime::GameStateManager::renderCurrentStates()
-{
-    for (const auto& state_ptr : state_stack_)
-    {
-        if (state_ptr)
+        while (!state_stack_.empty())
         {
-            state_ptr->render(*this);
+            state_stack_.back()->shutdown(*this);
+
+            state_stack_.pop_back();
+        }
+        pushState(std::move(new_state));
+    }
+
+    void GameStateManager::handleEvents()
+    {
+        if (!state_stack_.empty())
+        {
+            state_stack_.back()->handle_events(*this);
+        }
+    }
+
+    void GameStateManager::update(float delta_time)
+    {
+        if (!state_stack_.empty())
+        {
+            state_stack_.back()->update(*this, delta_time);
+        }
+    }
+
+    void GameStateManager::render()
+    {
+        for (const auto& state : state_stack_)
+        {
+            state->render(*this);
         }
     }
 }
