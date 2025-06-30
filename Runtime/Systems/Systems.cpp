@@ -2,7 +2,7 @@
 
 namespace cyanvne::ecs::systems
 {
-    void LayoutSystem(entt::registry& registry, platform::WindowContext& window, resources::ICacheResourcesManager& cache_manager)
+    void LayoutSystem(entt::registry& registry, const platform::WindowContext& window, const resources::ICacheResourcesManager& cache_manager)
     {
         auto view = registry.view<LayoutComponent>();
         SDL_Rect window_rect = window.getWindowRect();
@@ -19,9 +19,13 @@ namespace cyanvne::ecs::systems
 
             if ((target_w_px <= 0.0f && target_h_px > 0.0f) || (target_w_px > 0.0f && target_h_px <= 0.0f))
             {
-                if (auto* sprite = registry.try_get<SpriteComponent>(entity)) {
+                if (auto* sprite = registry.try_get<SpriteComponent>(entity))
+                {
                     float tex_w, tex_h;
-                    if (SDL_GetTextureSize(cache_manager.getTexture(sprite->resource_key).get()->texture(), &tex_w, &tex_h) && tex_w > 0 && tex_h > 0)
+
+                    SDL_Texture* texture = cache_manager.getTexture(sprite->resource_key).get()->texture;
+
+                    if (SDL_GetTextureSize(texture, &tex_w, &tex_h) && tex_w > 0 && tex_h > 0)
                     {
                         if (target_w_px > 0.0f)
                         {
@@ -47,58 +51,53 @@ namespace cyanvne::ecs::systems
     {
         auto view = registry.view<SpriteAnimationComponent, const VisibleComponent>();
 
-        for (auto entity : view)
-        {
-            auto& anime = view.get<SpriteAnimationComponent>(entity);
-
-            if (!anime.is_playing || anime.frames.empty() || anime.frame_duration <= 0.0f)
-                continue;
-
-            anime.current_time += delta_time;
-
-            if (anime.current_time >= anime.frame_duration)
+        view.each([&](entt::entity entity, SpriteAnimationComponent& anime)
             {
-                anime.current_time = 0.0f;
-                anime.current_frame++;
-                if (anime.current_frame >= anime.frames.size())
+                if (!anime.is_playing || anime.frames.empty() || anime.frame_duration <= 0.0f)
+                    return;
+
+                anime.current_time += delta_time;
+
+                if (anime.current_time >= anime.frame_duration)
                 {
-                    if (anime.loop)
-                        anime.current_frame = 0;
-                    else
+                    anime.current_time = 0.0f;
+                    anime.current_frame++;
+                    if (anime.current_frame >= static_cast<int>(anime.frames.size()))
                     {
-                        anime.current_frame = anime.frames.size() - 1;
-                        anime.is_playing = false;
+                        if (anime.loop)
+                            anime.current_frame = 0;
+                        else
+                        {
+                            anime.current_frame = static_cast<int>(anime.frames.size()) - 1;
+                            anime.is_playing = false;
+                        }
                     }
                 }
-            }
-        }
+            });
     }
 
     void RenderSystem(entt::registry& registry, const platform::WindowContext& window, const resources::ICacheResourcesManager& cache_manager)
     {
         auto view = registry.view<const RenderTransformComponent, const SpriteComponent, const VisibleComponent>();
 
-        for (auto entity : view)
-        {
-            const auto& transform = view.get<const RenderTransformComponent>(entity);
-            const auto& sprite = view.get<const SpriteComponent>(entity);
-
-            auto texture_handle = cache_manager.getTexture(sprite.resource_key);
-            SDL_Texture* texture = texture_handle->texture;
-            if (!texture)
-                continue;
-
-            SDL_FRect source_rect = sprite.source_rect;
-            if (auto* anime = registry.try_get<const SpriteAnimationComponent>(entity))
+        view.each([&](entt::entity entity, const RenderTransformComponent& transform, const SpriteComponent& sprite)
             {
-                if (!anime->frames.empty())
-                    source_rect = anime->frames[anime->current_frame];
-            }
+                auto texture_handle = cache_manager.getTexture(sprite.resource_key);
+                SDL_Texture* texture = texture_handle->texture;
+                if (!texture)
+                    return;
 
-            bool use_entire_texture = (source_rect.w - 0 < std::abs(0e-6) || source_rect.h - 0 < std::abs(0e-6));
+                SDL_FRect source_rect = sprite.source_rect;
+                if (auto* anime = registry.try_get<const SpriteAnimationComponent>(entity))
+                {
+                    if (!anime->frames.empty())
+                        source_rect = anime->frames[anime->current_frame];
+                }
 
-            SDL_RenderTexture(window.getRendererHinding(), texture, use_entire_texture ? nullptr : &source_rect, &transform.destination_rect);
-        }
+                bool use_entire_texture = (source_rect.w - 0 < std::abs(0e-6) || source_rect.h - 0 < std::abs(0e-6));
+
+                SDL_RenderTexture(window.getRendererHinding(), texture, use_entire_texture ? nullptr : &source_rect, &transform.destination_rect);
+            });
     }
 
     void CommandSystem(entt::registry& registry, runtime::GameStateManager& gsm, platform::EventBus& bus)

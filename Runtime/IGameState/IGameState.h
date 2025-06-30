@@ -3,6 +3,11 @@
 
 namespace cyanvne::runtime
 {
+    namespace ecs
+    {
+        class Scene;
+    }
+
     class IGameState
     {
     protected:
@@ -34,30 +39,11 @@ namespace cyanvne::runtime
         std::unique_ptr<ecs::Scene> scene_;
 
     public:
-        EcsGameState() : scene_(std::make_unique<ecs::Scene>())
-        {  }
-
-        void init(GameStateManager& manager) override
-        {  }
-        void shutdown(GameStateManager& manager) override
-        {
-            scene_.reset();
-        }
-
-        void handle_events(GameStateManager& manager) override
-        {
-        }
-
-        void update(GameStateManager& manager, float delta_time) override
-        {
-            if (scene_)
-                scene_->Update(delta_time);
-        }
-
-        void render(GameStateManager& manager) override
-        {
-            if (scene_)
-                scene_->Render(manager.getWindowContext(), manager.getResourceManager());
-        }
+        EcsGameState();
+        void init(GameStateManager& manager) override;
+        void shutdown(GameStateManager& manager) override;
+        void handle_events(GameStateManager& manager) override;
+        void update(GameStateManager& manager, float delta_time) override;
+        void render(GameStateManager& manager) override;
     };
 }

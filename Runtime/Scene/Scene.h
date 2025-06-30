@@ -24,3 +24,4 @@ namespace cyanvne::runtime::ecs
             return registry_;
         }
     };
+}

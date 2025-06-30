@@ -13,7 +13,7 @@ set(CyanVNERuntime_SRC
   "Systems/Systems.h"
   "Systems/Systems.cpp"
   "Scene/Scene.cpp"
- "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h")
+ "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h" "IGameState/IGameState.cpp" "Commands/Commands.h" "Events/Events.h")
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 

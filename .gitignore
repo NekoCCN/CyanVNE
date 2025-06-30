@@ -13,3 +13,6 @@ CMakeUserPresets.json
 /.vs
 /out/build/x64-debug
 *.user
+/cmake-build-debug/
+/.idea
+/out/build

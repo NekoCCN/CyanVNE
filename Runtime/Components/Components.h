@@ -51,22 +51,22 @@ namespace cyanvne::ecs
     struct HasKeyFocus
     {  };
 
-    using CommandQueue = std::deque<CommandPacket>;
+    using CommandQueue = std::deque<cyanvne::ecs::CommandPacket>;
 
     struct ClickableComponent
     {
-        std::vector<std::unique_ptr<commands::ICommand>> on_left_click;
-        std::vector<std::unique_ptr<commands::ICommand>> on_right_click;
+        std::vector<std::shared_ptr<commands::ICommand>> on_left_click;
+        std::vector<std::shared_ptr<commands::ICommand>> on_right_click;
     };
 
     struct KeyFocusComponent
     {
-        std::map<SDL_Keycode, std::vector<std::unique_ptr<commands::ICommand>>> key_actions;
+        std::map<SDL_Keycode, std::vector<std::shared_ptr<commands::ICommand>>> key_actions;
     };
 
     struct ScrollableComponent
     {
-        std::vector<std::unique_ptr<commands::ICommand>> on_scroll_up;
-        std::vector<std::unique_ptr<commands::ICommand>> on_scroll_down;
+        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_up;
+        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_down;
     };
 }

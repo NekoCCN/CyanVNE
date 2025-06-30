@@ -17,7 +17,7 @@ namespace cyanvne::runtime
         std::shared_ptr<platform::WindowContext> window_context_;
         std::shared_ptr<platform::EventBus> event_bus_;
         std::shared_ptr<resources::ICacheResourcesManager> cache_manager_;
-        ecs::CommandQueue command_queue_;
+        cyanvne::ecs::CommandQueue command_queue_;
         bool running_ = true;
 
     public:
@@ -57,7 +57,7 @@ namespace cyanvne::runtime
         {
             return cache_manager_;
         }
-        ecs::CommandQueue& getCommandQueue()
+        cyanvne::ecs::CommandQueue& getCommandQueue()
         {
             return command_queue_;
         }

@@ -7,7 +7,7 @@
 
 namespace cyanvne::ecs::systems
 {
-    void LayoutSystem(entt::registry& registry, platform::WindowContext& window, resources::ICacheResourcesManager& cache_manager);
+    void LayoutSystem(entt::registry& registry, const platform::WindowContext& window, const resources::ICacheResourcesManager& cache_manager);
 
     void AnimationSystem(entt::registry& registry, float delta_time);
 
@@ -18,12 +18,12 @@ namespace cyanvne::ecs::systems
     class InteractionSystem
     {
     private:
-        entt::registry& registry_;
-        runtime::GameStateManager& gsm_;
+        std::shared_ptr<entt::registry> registry_;
+        std::shared_ptr<runtime::GameStateManager> gsm_;
 
-        void pushCommands(const std::vector<std::unique_ptr<commands::ICommand>>& commands, entt::entity source) const
+        void pushCommands(const std::vector<std::shared_ptr<commands::ICommand>>& commands, entt::entity source) const
         {
-            auto& queue = gsm_.getCommandQueue();
+            auto& queue = gsm_->getCommandQueue();
             for (const auto& cmd_ptr : commands)
             {
                 if (cmd_ptr)
@@ -34,8 +34,9 @@ namespace cyanvne::ecs::systems
         }
 
     public:
-        InteractionSystem(entt::registry& reg, platform::EventBus& bus, runtime::GameStateManager& gsm)
-            : registry_(reg), gsm_(gsm)
+        InteractionSystem(const std::shared_ptr<entt::registry>& registry, platform::EventBus& bus,
+            const std::shared_ptr<runtime::GameStateManager>& gsm)
+            : registry_(registry), gsm_(gsm)
         {
             bus.subscribeSDL([this](const SDL_Event& event)
                 {
@@ -43,72 +44,85 @@ namespace cyanvne::ecs::systems
                 });
         }
 
-        bool processInput(const SDL_Event& event)
+        bool processInput(const SDL_Event& event) const
         {
             if (event.type == SDL_EVENT_MOUSE_BUTTON_UP)
             {
                 float mouse_x = (float)event.button.x;
                 float mouse_y = (float)event.button.y;
-                auto view = registry_.view<const ClickableComponent, const RenderTransformComponent, const VisibleComponent>();
+                auto view = registry_->view<const ClickableComponent, const RenderTransformComponent, const VisibleComponent>();
+                bool processed = false;
 
-                for (auto entity : view)
-                {
-                    const auto& transform = view.get<const RenderTransformComponent>(entity);
-                    SDL_FPoint point = { mouse_x, mouse_y };
-
-                    if (SDL_PointInRectFloat(&point, &transform.destination_rect))
+                view.each([this, &event, mouse_x, mouse_y, &processed](entt::entity entity, const ClickableComponent& clickable,
+                    const RenderTransformComponent& transform)
                     {
-                        const auto& clickable = view.get<const ClickableComponent>(entity);
-                        if (event.button.button == SDL_BUTTON_LEFT)
+                        SDL_FPoint point = { mouse_x, mouse_y };
+                        if (SDL_PointInRectFloat(&point, &transform.destination_rect))
                         {
-                            pushCommands(clickable.on_left_click, entity);
+                            if (event.button.button == SDL_BUTTON_LEFT)
+                            {
+                                pushCommands(clickable.on_left_click, entity);
+                            }
+                            else if (event.button.button == SDL_BUTTON_RIGHT)
+                            {
+                                pushCommands(clickable.on_right_click, entity);
+                            }
+                            processed = true;
                         }
-                        else if (event.button.button == SDL_BUTTON_RIGHT)
-                        {
-                            pushCommands(clickable.on_right_click, entity);
-                        }
-                        return true;
-                    }
+                    });
+
+                if (processed)
+                {
+                    return true;
                 }
             }
             else if (event.type == SDL_EVENT_KEY_DOWN)
             {
-                auto view = registry_.view<const KeyFocusComponent, const HasKeyFocus>();
-                for (auto entity : view)
-                {
-                    const auto& key_focus = view.get<const KeyFocusComponent>(entity);
-                    if (auto it = key_focus.key_actions.find(event.key.key); it != key_focus.key_actions.end())
-                    {
-                        pushCommands(it->second, entity);
+                auto view = registry_->view<const KeyFocusComponent, const HasKeyFocus>();
+                bool processed = false;
 
-                        return true;
-                    }
+                view.each([this, &event, &processed](entt::entity entity, const KeyFocusComponent& key_focus)
+                    {
+                        if (auto it = key_focus.key_actions.find(event.key.key); it != key_focus.key_actions.end())
+                        {
+                            pushCommands(it->second, entity);
+                            processed = true;
+                        }
+                    });
+
+                if (processed)
+                {
+                    return true;
                 }
             }
             else if (event.type == SDL_EVENT_MOUSE_WHEEL)
             {
                 float mouse_x, mouse_y;
                 SDL_GetMouseState(&mouse_x, &mouse_y);
-                auto view = registry_.view<const ScrollableComponent, const RenderTransformComponent, const VisibleComponent>();
+                auto view = registry_->view<const ScrollableComponent, const RenderTransformComponent, const VisibleComponent>();
+                bool processed = false;
 
-                for (auto entity : view)
-                {
-                    const auto& transform = view.get<const RenderTransformComponent>(entity);
-                    SDL_FPoint point = { mouse_x, mouse_y };
-
-                    if (SDL_PointInRectFloat(&point, &transform.destination_rect))
+                view.each([this, &event, mouse_x, mouse_y, &processed](entt::entity entity, const ScrollableComponent& scrollable,
+                    const RenderTransformComponent& transform)
                     {
-                        const auto& scrollable = view.get<const ScrollableComponent>(entity);
-                        if (event.wheel.y > 0)
+                        SDL_FPoint point = { mouse_x, mouse_y };
+                        if (SDL_PointInRectFloat(&point, &transform.destination_rect))
                         {
-                            pushCommands(scrollable.on_scroll_up, entity);
+                            if (event.wheel.y > 0)
+                            {
+                                pushCommands(scrollable.on_scroll_up, entity);
+                            }
+                            else if (event.wheel.y < 0)
+                            {
+                                pushCommands(scrollable.on_scroll_down, entity);
+                            }
+                            processed = true;
                         }
-                        else if (event.wheel.y < 0)
-                        {
-                            pushCommands(scrollable.on_scroll_down, entity);
-                        }
-                        return true;
-                    }
+                    });
+
+                if (processed)
+                {
+                    return true;
                 }
             }
 
