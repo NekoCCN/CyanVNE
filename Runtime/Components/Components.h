@@ -18,6 +18,12 @@ namespace cyanvne::ecs
         SDL_FPoint anchor{ 0.5f, 0.5f };
     };
 
+    struct TransformComponent
+    {
+        SDL_FPoint position{ 0.0f, 0.0f };
+        SDL_FPoint scale{ 1.0f, 1.0f };
+    };
+
     struct RenderTransformComponent
     {
         SDL_FRect destination_rect;

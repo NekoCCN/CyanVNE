@@ -14,13 +14,20 @@ set(CyanVNEParser_SRC
   "Framework/Framework.h"
   "Framework/Framework.cpp"
   "ParserFactories/ParserFactories.h"
+        "DataStructures/GameData.h"
+        GameDataParsers/GameDataParsers.cpp
+        GameDataParsers/GameDataParsers.h
+        Ecs/ComponentParsers.cpp
+        Ecs/ComponentParsers.h
 )
 
 add_library(CyanVNEParser STATIC ${CyanVNEParser_SRC})
 
 set(CyanVNEParser_Require
   CyanVNECore
+        CyanVNERuntime
   yaml-cpp
+        EnTT::EnTT
 )
 
 target_link_libraries(CyanVNEParser PUBLIC ${CyanVNEParser_Require})

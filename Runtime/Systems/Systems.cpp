@@ -7,8 +7,8 @@ namespace cyanvne::ecs::systems
         auto view = registry.view<LayoutComponent>();
         SDL_Rect window_rect = window.getWindowRect();
 
-        float window_w = static_cast<float>(window_rect.w);
-        float window_h = static_cast<float>(window_rect.h);
+        auto window_w = static_cast<float>(window_rect.w);
+        auto window_h = static_cast<float>(window_rect.h);
 
         for (auto entity : view)
         {
@@ -44,6 +44,24 @@ namespace cyanvne::ecs::systems
             final_rect.y = (layout.area_ratio.y * window_h) - (final_rect.h * layout.anchor.y);
 
             registry.emplace_or_replace<RenderTransformComponent>(entity, final_rect);
+        }
+    }
+
+    void TransformSystem(entt::registry& registry, const platform::WindowContext& window)
+    {
+        auto view = registry.view<TransformComponent>();
+
+        for (auto entity : view)
+        {
+            auto& transform = view.get<TransformComponent>(entity);
+            RenderTransformComponent render_transform = {};
+
+            render_transform.destination_rect.x = transform.position.x;
+            render_transform.destination_rect.y = transform.position.y;
+            render_transform.destination_rect.w = static_cast<float>(window.getWindowRect().w) * transform.scale.x;
+            render_transform.destination_rect.h = static_cast<float>(window.getWindowRect().h) * transform.scale.y;
+
+            registry.emplace_or_replace<RenderTransformComponent>(entity, render_transform);
         }
     }
 

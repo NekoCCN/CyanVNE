@@ -9,6 +9,8 @@ namespace cyanvne::ecs::systems
 {
     void LayoutSystem(entt::registry& registry, const platform::WindowContext& window, const resources::ICacheResourcesManager& cache_manager);
 
+    void TransformSystem(entt::registry& registry, const platform::WindowContext& window);
+
     void AnimationSystem(entt::registry& registry, float delta_time);
 
     void RenderSystem(entt::registry& registry, const platform::WindowContext& window, const resources::ICacheResourcesManager& cache_manager);
