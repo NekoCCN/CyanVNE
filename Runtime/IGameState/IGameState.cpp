@@ -19,7 +19,7 @@ void cyanvne::runtime::EcsGameState::handle_events(cyanvne::runtime::GameStateMa
 void cyanvne::runtime::EcsGameState::update(cyanvne::runtime::GameStateManager& manager, float delta_time)
 {
     if (scene_)
-        scene_->update(delta_time);
+        scene_->update(delta_time, *manager.getEventBus());
 }
 
 void cyanvne::runtime::EcsGameState::render(cyanvne::runtime::GameStateManager& manager)

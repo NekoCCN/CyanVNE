@@ -102,7 +102,6 @@ namespace cyanvne::parser::theme
 		return "theme_resource";
 	}
 
-
 	std::unique_ptr<ParsedNodeData> ThemeParser::parse(const YAML::Node& node, const NodeParserRegistry& registry) const
 	{
 		ThemeConfig config;

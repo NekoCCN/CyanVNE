@@ -31,7 +31,7 @@ namespace cyanvne
 			class ThemeParser : public INodeParser
 			{
 			private:
-				static constexpr std::vector<std::string> REQUIRED_KEY_ = {
+				inline static const std::vector<std::string> REQUIRED_KEY_ = {
 					"main_menu_icon",
 					"background",
 					"create_cyan_data",
@@ -50,7 +50,7 @@ namespace cyanvne
 			class ThemeGeneratorParser : public INodeParser
 			{
 			private:
-				static constexpr std::vector<std::string> REQUIRED_KEY_ = {
+				inline static const std::vector<std::string> REQUIRED_KEY_ = {
 					"main_menu_icon",
 					"background",
 					"create_cyan_data",

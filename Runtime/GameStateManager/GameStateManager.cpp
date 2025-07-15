@@ -1,6 +1,9 @@
 #include "GameStateManager.h"
 #include <Runtime/IGameState/IGameState.h>
 
+#include "Parser/Ecs/ComponentParsers.h"
+#include "Runtime/Systems/Systems.h"
+
 namespace cyanvne::runtime
 {
     GameStateManager::GameStateManager(std::shared_ptr<platform::WindowContext> window_ctx, std::shared_ptr<platform::EventBus> event_bus)
@@ -74,6 +77,8 @@ namespace cyanvne::runtime
 
     void GameStateManager::update(float delta_time)
     {
+        cyanvne::ecs::systems::CommandSystem(state_stack_.back()->getScene(), *this, *event_bus_);
+
         if (!state_stack_.empty())
         {
             state_stack_.back()->update(*this, delta_time);

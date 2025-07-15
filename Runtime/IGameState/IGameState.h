@@ -37,7 +37,6 @@ namespace cyanvne::runtime
     {
     protected:
         std::unique_ptr<ecs::Scene> scene_;
-
     public:
         EcsGameState();
         void init(GameStateManager& manager) override;
