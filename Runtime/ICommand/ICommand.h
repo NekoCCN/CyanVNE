@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <Platform/EventBus/EventBus.h>
 
 namespace cyanvne::runtime
 {

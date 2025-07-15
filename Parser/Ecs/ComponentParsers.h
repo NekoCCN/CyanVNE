@@ -6,8 +6,6 @@
 #define COMPONENTPARSERS_H
 #include <entt/entt.hpp>
 #include <yaml-cpp/yaml.h>
-#include <Parser/ParserException/ParserException.h>
-
 #include "Parser/Framework/Framework.h"
 
 namespace cyanvne::parser::ecs
@@ -18,38 +16,14 @@ namespace cyanvne::parser::ecs
         virtual ~IComponentEmplacer() = default;
         virtual void emplace_to(entt::registry& registry, entt::entity entity) const = 0;
     };
-    class IComponentParser
-    {
-    public:
-        virtual ~IComponentParser() = default;
-        virtual std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node) const = 0;
-    };
-
-    class ComponentParserRegistry
-    {
-    private:
-        std::unordered_map<std::string, std::shared_ptr<IComponentParser>> parsers_;
-    public:
-        void registerParser(const std::string& name, std::shared_ptr<IComponentParser> parser)
-        {
-            parsers_[name] = std::move(parser);
-        }
-        std::unique_ptr<IComponentEmplacer> parseComponent(const std::string& name, const YAML::Node& node) const
-        {
-            if (auto it = parsers_.find(name); it != parsers_.end())
-            {
-                return it->second->parse(node);
-            }
-            throw exception::parserexception::ParserException("Component Parser Error", "No parser registered for component type: " + name);
-        }
-    };
 
     template<typename T>
     class ComponentEmplacer : public IComponentEmplacer
     {
+    private:
         T component_data_;
     public:
-        ComponentEmplacer(T data) : component_data_(std::move(data))
+        explicit ComponentEmplacer(T data) : component_data_(std::move(data))
         {  }
         void emplace_to(entt::registry& registry, entt::entity entity) const override
         {
@@ -57,45 +31,95 @@ namespace cyanvne::parser::ecs
         }
     };
 
-    class TransformComponentParser : public IComponentParser
+    class IdentifierComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "identifier";
+        }
     };
 
-    class LayoutComponentParser : public IComponentParser
+    class TransformComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "transform";
+        }
     };
 
-    class SpriteComponentParser : public IComponentParser
+    class LayoutComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "layout";
+        }
     };
 
-    class SpriteAnimationComponentParser : public IComponentParser
+    class SpriteComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "sprite";
+        }
     };
 
-    class ClickableComponentParser : public IComponentParser
+    class SpriteAnimationComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "sprite_animation";
+        }
     };
 
-    class KeyFocusComponentParser : public IComponentParser
+    class ClickableComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "clickable";
+        }
     };
 
-    class ScrollableComponentParser : public IComponentParser
+    class KeyFocusComponentParser : public INodeParser
     {
     public:
-        std::unique_ptr<IComponentEmplacer> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "key_focus";
+        }
+    };
+
+    class ScrollableComponentParser : public INodeParser
+    {
+    public:
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "scrollable";
+        }
+    };
+
+    class IdentifierComponent : public INodeParser
+    {
+    public:
+        [[nodiscard]] std::unique_ptr<ParsedNodeData> parse(const YAML::Node& node, const NodeParserRegistry& main_registry) const override;
+        [[nodiscard]] std::string getParsableNodeType() const override
+        {
+            return "identifier";
+        }
     };
 }
+
+#endif // COMPONENTPARSERS_H

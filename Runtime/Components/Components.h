@@ -7,24 +7,55 @@
 
 namespace cyanvne::ecs
 {
+    /**
+     * @brief 标识符组件。
+     * 用于标记实体的唯一标识符，通常用于在系统中快速查找和引用实体。
+     */
     struct IdentifierComponent
     {
         std::string id;
     };
 
+    /**
+     * @brief 布局组件。
+     * 用于定义实体在窗口中的布局位置和大小比例。
+     * area_ratio 是一个比例矩形，anchor 定义了该矩形的锚点位置。
+     */
     struct LayoutComponent
     {
         SDL_FRect area_ratio{ 0.5f, 0.5f, 0.1f, 0.1f };
         SDL_FPoint anchor{ 0.5f, 0.5f };
     };
 
-    struct TransformComponent
-    {
-        SDL_FPoint position{ 0.0f, 0.0f };
-        SDL_FPoint scale{ 1.0f, 1.0f };
+
+    /**
+     * @brief 父实体组件。
+     * 标记一个实体拥有一个父实体。
+     */
+    struct ParentComponent {
+        entt::entity parent = entt::null;
     };
 
-    struct RenderTransformComponent
+    /**
+     * @brief 子实体列表组件。
+     * 存储一个实体的所有子实体，方便快速遍历和关系管理。
+     */
+    struct ChildrenComponent {
+        std::vector<entt::entity> children;
+    };
+
+    /**
+     * @brief 局部变换组件。
+     * 存储实体相对于其父实体的“局部”位置、缩放和旋转。
+     * 如果没有父实体，则相对于世界原点。
+     */
+    struct TransformComponent {
+        SDL_FPoint position{ 0.0f, 0.0f };
+        SDL_FPoint scale{ 1.0f, 1.0f };
+        double rotation = 0.0;
+    };
+
+    struct FinalTransformComponent
     {
         SDL_FRect destination_rect;
     };
@@ -33,6 +64,8 @@ namespace cyanvne::ecs
     {
         std::string resource_key;
         SDL_FRect source_rect{ 0, 0, 0, 0 };
+
+        SDL_Color color_mod{ 255, 255, 255, 255 }; // RGBA color modulation
     };
 
     struct SpriteAnimationComponent
@@ -43,6 +76,38 @@ namespace cyanvne::ecs
         int current_frame = 0;
         bool is_playing = true;
         bool loop = true;
+    };
+
+    struct Tween
+    {
+        enum class Property
+        {
+            TRANSFORM_POSITION_X,
+            TRANSFORM_POSITION_Y,
+            SPRITE_ALPHA
+        };
+
+        enum class EaseType
+        {
+            LINEAR,
+            EASE_IN_QUAD,
+            EASE_OUT_QUAD,
+            EASE_IN_OUT_QUAD,
+            EASE_OUT_SINE
+        };
+
+        Property target_property;
+        EaseType easing_type = EaseType::LINEAR;
+        float start_value;
+        float end_value;
+        float duration;
+        float elapsed_time = 0.0f;
+        bool is_finished = false;
+    };
+
+    struct TweenListComponent
+    {
+        std::vector<Tween> tweens;
     };
 
     struct VisibleComponent
@@ -57,7 +122,7 @@ namespace cyanvne::ecs
     struct HasKeyFocus
     {  };
 
-    using CommandQueue = std::deque<cyanvne::ecs::CommandPacket>;
+    using CommandQueue = std::deque<CommandPacket>;
 
     struct ClickableComponent
     {
