@@ -14,6 +14,8 @@ set(CyanVNEPlatform_SRC
   "EventBus/EventBus.cpp"
   "Monitor/Monitor.h"
   "Monitor/Monitor.cpp"
+        ErrorEvent/ErrorEvent.cpp
+        ErrorEvent/ErrorEvent.h
 )
 
 add_library(CyanVNEPlatform STATIC ${CyanVNEPlatform_SRC})

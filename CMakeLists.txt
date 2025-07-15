@@ -1,30 +1,24 @@
 ﻿cmake_minimum_required (VERSION 3.15.7)
 
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
-
-project ("CyanVNE")
+project (CyanVNE VERSION 0.1.0)
 
 if (CMAKE_HOST_WIN32)
   add_compile_definitions( IS_WIN32_SYS )
   add_compile_definitions ( _CRT_SECURE_NO_WARNINGS )
-  add_compile_definitions(NOMINMAX)
+  add_compile_definitions( NOMINMAX )
 endif()
-
-# EnTT
-add_subdirectory( "External/entt" )
 
 # Boost
 add_subdirectory( "External/boost" )
 
-# Lua
-set ( LUA_LANGUAGE "CXX" )
-set ( LUA_LANGUAGE_SUPPORT "CXX" )
-set ( LUA_USE_LONGJMP OFF )
-set ( LUA_USE_APICHECK ON )
-add_subdirectory( "External/lua-cmake" )
+# LuaJIT
+add_subdirectory( "External/pre_LuaJIT" )
+
+# Sol2
+add_subdirectory( "External/sol2" )
+
+# EnTT
+add_subdirectory( "External/entt" )
 
 # SDL
 set (BUILD_SHARED_LIBS false)
@@ -33,8 +27,11 @@ add_subdirectory( "External/SDL" )
 include_directories( "External/SDL/include" )
 
 # SDL Extension
+set(SDLTTF_VENDORED TRUE)
 add_subdirectory( "External/SDL_ttf" )
 include_directories( "External/SDL_ttf/include" )
+set(SDLIMAGE_VENDORED TRUE)
+set(SDLIMAGE_AVIF OFF CACHE BOOL "Disable internal AVIF to use top-level aom" FORCE)
 add_subdirectory( "External/SDL_image" )
 include_directories( "External/SDL_image/include" )
 

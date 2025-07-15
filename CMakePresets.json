@@ -1,16 +1,33 @@
 ﻿{
-    "version": 3,
+    "version": 4,
     "configurePresets": [
         {
-            "name": "windows-base",
+            "name": "base",
             "hidden": true,
+            "description": "Base settings shared by all presets",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "cl.exe",
-                "CMAKE_CXX_COMPILER": "cl.exe"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "windows-vs-base",
+            "hidden": true,
+            "description": "Base settings for Windows using Visual Studio",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
             },
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64"
+        },
+        {
+            "name": "windows-ninja-base",
+            "hidden": true,
+            "description": "Base settings for Windows using Ninja",
+            "inherits": "base",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -18,83 +35,84 @@
             }
         },
         {
-            "name": "x64-debug",
-            "displayName": "x64 Debug",
-            "inherits": "windows-base",
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "x64-release",
-            "displayName": "x64 Release",
-            "inherits": "x64-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "x86-debug",
-            "displayName": "x86 Debug",
-            "inherits": "windows-base",
-            "architecture": {
-                "value": "x86",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "x86-release",
-            "displayName": "x86 Release",
-            "inherits": "x86-debug",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "linux-debug",
-            "displayName": "Linux Debug",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            },
+            "name": "linux-base",
+            "hidden": true,
+            "description": "Base settings for Linux using GCC or Clang",
+            "inherits": "base",
             "condition": {
-                "type": "equals",
+                "type": "notEquals",
                 "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
-                }
+                "rhs": "Windows"
             }
         },
         {
-            "name": "macos-debug",
-            "displayName": "macOS Debug",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
+            "name": "debug-msvc-vs",
+            "displayName": "Debug (Visual Studio)",
+            "description": "Debug build for Windows using the Visual Studio generator.",
+            "inherits": "windows-vs-base",
+            "binaryDir": "${sourceDir}/build/debug-msvc-vs",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
-                }
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/Debug/generators/conan_toolchain.cmake"
+            }
+        },
+        {
+            "name": "release-msvc-vs",
+            "displayName": "Release (Visual Studio)",
+            "description": "Release build for Windows using the Visual Studio generator.",
+            "inherits": "windows-vs-base",
+            "binaryDir": "${sourceDir}/build/release-msvc-vs",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/Release/generators/conan_toolchain.cmake"
+            }
+        },
+        {
+            "name": "debug-linux",
+            "displayName": "Debug (Linux)",
+            "description": "Debug build for Linux platforms (GCC/Clang).",
+            "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/debug-linux",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/Debug/debug-linux/generators/conan_toolchain.cmake"
+            }
+        },
+        {
+            "name": "release-linux",
+            "displayName": "Release (Linux)",
+            "description": "Release build for Linux platforms (GCC/Clang).",
+            "inherits": "linux-base",
+            "binaryDir": "${sourceDir}/build/release-linux",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/Release/build/generators/conan_toolchain.cmake"
+            }
+        },
+        {
+            "name": "release-clang-ninja",
+            "displayName": "Release (MSVC Ninja)",
+            "description": "Release build for Windows using the Ninja generator with MSVC.",
+            "inherits": "windows-ninja-base",
+            "binaryDir": "${sourceDir}/build/release-msvc-ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_CXX_COMPILER": "clang++.exe",
+                "CMAKE_C_COMPILER": "clang.exe"
+            }
+        },
+        {
+            "name": "debug-clang-ninja",
+            "displayName": "Debug (MSVC Ninja)",
+            "description": "Debug build for Windows using the Ninja generator with MSVC.",
+            "inherits": "windows-ninja-base",
+            "binaryDir": "${sourceDir}/build/debug-msvc-ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_STANDARD": "23",
+                "CMAKE_CXX_COMPILER": "clang++.exe",
+                "CMAKE_C_COMPILER": "clang.exe"
             }
         }
     ]

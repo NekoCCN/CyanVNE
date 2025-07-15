@@ -19,6 +19,10 @@ set(CyanVNEParser_SRC
         GameDataParsers/GameDataParsers.h
         Ecs/ComponentParsers.cpp
         Ecs/ComponentParsers.h
+        CommandsParser/CommandsParser.cpp
+        CommandsParser/CommandsParser.h
+        CommandParser/CommandParser.cpp
+        CommandParser/CommandParser.h
 )
 
 add_library(CyanVNEParser STATIC ${CyanVNEParser_SRC})

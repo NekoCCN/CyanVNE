@@ -124,8 +124,7 @@ namespace cyanvne
 					std::make_shared<resources::ResourcesManager>(theme_resources_stream);
 				theme_resources_ = std::make_shared<resources::ThemeResourcesManager>(theme_resources_manager,
 					app_settings_.caching.theme_caching_config.max_volatile_size,
-					app_settings_.caching.theme_caching_config.max_persistent_size,
-					app_settings_.caching.theme_caching_config.max_single_persistent_size
+					window_context_->getRendererHinding()
 				);
 			}
 			catch (const exception::resourcesexception::ResourceManagerIOException& e)
@@ -150,10 +149,10 @@ namespace cyanvne
 
 			gui_context_ = app_settings_.languages.is_enabled ?
 				platform::GuiContext::create(window_context_,
-					               theme_resources_->getResourceData("built_in_font"), 30, app_settings_.languages.supported_languages)
+					               theme_resources_->getData("built_in_font")->data, 30, app_settings_.languages.supported_languages)
 				:
 				platform::GuiContext::create(window_context_,
-					               theme_resources_->getResourceData("built_in_font"), 30);
+					               theme_resources_->getData("built_in_font")->data, 30);
 
 			event_bus_ = std::make_shared<platform::EventBus>();
 

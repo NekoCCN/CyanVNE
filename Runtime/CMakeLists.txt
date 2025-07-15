@@ -13,7 +13,8 @@ set(CyanVNERuntime_SRC
   "Systems/Systems.h"
   "Systems/Systems.cpp"
   "Scene/Scene.cpp"
- "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h" "IGameState/IGameState.cpp" "Commands/Commands.h" "Events/Events.h")
+ "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h" "IGameState/IGameState.cpp" "Commands/Commands.h" "Events/Events.h"
+        RuntimeException/RuntimeException.h)
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 
@@ -22,6 +23,7 @@ set(CyanVNERuntime_Require
   CyanVNEPlatform
   lua_library_static
   EnTT::EnTT
+        LuaJIT
 )
 
 target_link_libraries(CyanVNERuntime PUBLIC ${CyanVNERuntime_Require})
