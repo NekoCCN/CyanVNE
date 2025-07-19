@@ -7,7 +7,39 @@
 
 namespace cyanvne::ecs::systems
 {
-    void LayoutSystem(entt::registry& registry, const platform::WindowContext& window, const resources::ICacheResourcesManager& cache_manager);
+    namespace Easing
+    {
+        inline float Linear(float t)
+        {
+            return t;
+        }
+        inline float EaseInQuad(float t)
+        {
+            return t * t;
+        }
+        inline float EaseOutQuad(float t)
+        {
+            return t * (2.0f - t);
+        }
+        inline float EaseInOutQuad(float t)
+        {
+            return t < 0.5f ? 2.0f * t * t : -1.0f + (4.0f - 2.0f * t) * t;
+        }
+        inline float EaseOutSine(float t)
+        {
+            return sin(t * (float)M_PI / 2.0f);
+        }
+    }
+
+    void LayoutSystem(entt::registry& registry, const cyanvne::platform::WindowContext& window,
+                      const cyanvne::resources::ICacheResourcesManager& cache_manager);
+
+    void SetParent(entt::registry& registry, entt::entity child, entt::entity parent);
+
+    void HierarchySystem(entt::registry& registry, const cyanvne::resources::ICacheResourcesManager& cache_manager);
+
+    void UpdateWorldTransformRecursive(entt::registry& registry, entt::entity entity,
+        const ecs::TransformComponent& parent_world_transform);
 
     void TransformSystem(entt::registry& registry, const platform::WindowContext& window);
 
@@ -21,24 +53,23 @@ namespace cyanvne::ecs::systems
     {
     private:
         std::shared_ptr<entt::registry> registry_;
-        std::shared_ptr<runtime::GameStateManager> gsm_;
+        std::shared_ptr<cyanvne::ecs::CommandQueue> command_queue_;
 
         void pushCommands(const std::vector<std::shared_ptr<commands::ICommand>>& commands, entt::entity source) const
         {
-            auto& queue = gsm_->getCommandQueue();
             for (const auto& cmd_ptr : commands)
             {
                 if (cmd_ptr)
                 {
-                    queue.push_back({ .command= cmd_ptr->clone(), .source_entity= source});
+                    command_queue_->push_back({ .command= cmd_ptr->clone(), .source_entity= source});
                 }
             }
         }
 
     public:
         InteractionSystem(const std::shared_ptr<entt::registry>& registry, platform::EventBus& bus,
-            const std::shared_ptr<runtime::GameStateManager>& gsm)
-            : registry_(registry), gsm_(gsm)
+            const std::shared_ptr<cyanvne::ecs::CommandQueue>& command_queue)
+            : registry_(registry), command_queue_(command_queue)
         {
             bus.subscribeSDL([this](const SDL_Event& event)
                 {
@@ -52,11 +83,11 @@ namespace cyanvne::ecs::systems
             {
                 float mouse_x = (float)event.button.x;
                 float mouse_y = (float)event.button.y;
-                auto view = registry_->view<const ClickableComponent, const RenderTransformComponent, const VisibleComponent>();
+                auto view = registry_->view<const ClickableComponent, const FinalTransformComponent, const VisibleComponent>();
                 bool processed = false;
 
                 view.each([this, &event, mouse_x, mouse_y, &processed](entt::entity entity, const ClickableComponent& clickable,
-                    const RenderTransformComponent& transform)
+                    const FinalTransformComponent& transform)
                     {
                         SDL_FPoint point = { mouse_x, mouse_y };
                         if (SDL_PointInRectFloat(&point, &transform.destination_rect))
@@ -101,11 +132,11 @@ namespace cyanvne::ecs::systems
             {
                 float mouse_x, mouse_y;
                 SDL_GetMouseState(&mouse_x, &mouse_y);
-                auto view = registry_->view<const ScrollableComponent, const RenderTransformComponent, const VisibleComponent>();
+                auto view = registry_->view<const ScrollableComponent, const FinalTransformComponent, const VisibleComponent>();
                 bool processed = false;
 
                 view.each([this, &event, mouse_x, mouse_y, &processed](entt::entity entity, const ScrollableComponent& scrollable,
-                    const RenderTransformComponent& transform)
+                    const FinalTransformComponent& transform)
                     {
                         SDL_FPoint point = { mouse_x, mouse_y };
                         if (SDL_PointInRectFloat(&point, &transform.destination_rect))
