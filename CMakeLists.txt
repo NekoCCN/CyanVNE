@@ -20,6 +20,9 @@ add_subdirectory( "External/sol2" )
 # EnTT
 add_subdirectory( "External/entt" )
 
+# GLM
+add_subdirectory( "External/glm" )
+
 # SDL
 set (BUILD_SHARED_LIBS false)
 set(SDL_STATIC on)

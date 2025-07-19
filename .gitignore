@@ -18,4 +18,3 @@ CMakeUserPresets.json
 /out/build
 /cmake-build-debug-mingw/.cmake/api/v1/query
 /cmake-build-debug-visual-studio
-/External/boost/libs

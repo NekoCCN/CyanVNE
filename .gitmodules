@@ -19,15 +19,22 @@
 [submodule "External/yaml-cpp"]
 	path = External/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+	ignore = all
 [submodule "External/entt"]
 	path = External/entt
 	url = https://github.com/NekoCCN/entt.git
 [submodule "External/boost"]
 	path = External/boost
 	url = https://github.com/boostorg/boost.git
+	ignore = all
 [submodule "External/sol2"]
 	path = External/sol2
 	url = https://github.com/ThePhD/sol2.git
+	ignore = all
 [submodule "External/pre_LuaJIT/LuaJIT"]
 	path = External/pre_LuaJIT/LuaJIT
 	url = https://github.com/LuaJIT/LuaJIT.git
+	ignore = all
+[submodule "External/glm"]
+	path = External/glm
+	url = https://github.com/g-truc/glm.git
