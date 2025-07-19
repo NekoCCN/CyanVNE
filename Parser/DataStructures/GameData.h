@@ -44,7 +44,7 @@ namespace cyanvne::parser::data
 
     struct EntityComponent
     {
-        std::vector<ecs::IComponentEmplacer> components;
+        std::vector<std::unique_ptr<ecs::IComponentEmplacer>> components;
     };
 
     struct Declarations

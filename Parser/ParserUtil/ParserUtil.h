@@ -31,6 +31,12 @@ namespace cyanvne
             std::vector<YAML::Node> getSequenceAsNodeVectorElseThrow(const YAML::Node& parent_node, const std::string& key,
                 const std::string& parser_name);
 
+            std::map<std::string, YAML::Node> getMapSequenceAsNodeMapElseThrow(const YAML::Node& node, const std::string& key,
+                const std::string& parser_name);
+
+            std::map<std::string, YAML::Node> resolveMapSequenceAsNodeMapElseThrow(const YAML::Node& parent_node,
+                const std::string& parser_name);
+
             std::map<std::string, YAML::Node> getMapAsNodeMapElseThrow(const YAML::Node& parent_node, const std::string& key,
                 const std::string& parser_name);
 

@@ -145,19 +145,6 @@ namespace cyanvne
 	        }
 
 
-        	inline std::shared_ptr<ecs::ComponentParserRegistry> createComponentParserRegistry()
-	        {
-	        	auto registry = std::make_shared<ecs::ComponentParserRegistry>();
-
-	        	registry->registerParser("TransformComponent", std::make_shared<ecs::TransformComponentParser>());
-	        	registry->registerParser("LayoutComponent", std::make_shared<ecs::LayoutComponentParser>());
-	        	registry->registerParser("SpriteComponent", std::make_shared<ecs::SpriteComponentParser>());
-	        	registry->registerParser("SpriteAnimationComponent", std::make_shared<ecs::SpriteAnimationComponentParser>())''
-
-	        	return registry;
-	        }
-
-
         	inline std::shared_ptr<NodeParserRegistry> createGameDataParserRegistry()
 	        {
 	        	auto component_registry = createComponentParserRegistry();
@@ -177,22 +164,6 @@ namespace cyanvne
 	        	return main_registry;
 	        }
 
-        	inline GameData loadGameDataFromNode(const YAML::Node& root_node)
-	        {
-	        	const static auto registry = createGameDataParserRegistry();
-
-	        	auto parsed_data = registry->parseNodeByKeyOrType("game_data", root_node);
-
-	        	if (const auto* game_data = parsed_data->getAs<data::GameData>())
-	        	{
-	        		return *game_data;
-	        	}
-
-	        	throw exception::parserexception::ParserException(
-					"Internal Loader Error",
-					"Could not cast parsed data to GameData."
-				);
-	        }
         }
     }
 }

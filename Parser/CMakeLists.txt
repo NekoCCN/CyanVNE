@@ -23,6 +23,7 @@ set(CyanVNEParser_SRC
         CommandsParser/CommandsParser.h
         CommandParser/CommandParser.cpp
         CommandParser/CommandParser.h
+        Ecs/ComponentEmplacer.h
 )
 
 add_library(CyanVNEParser STATIC ${CyanVNEParser_SRC})
