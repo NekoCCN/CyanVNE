@@ -1,71 +1,73 @@
 #pragma once
+
 #include <string>
 #include <vector>
+#include <deque>
+#include <memory>
+#include <map>
 #include <SDL3/SDL.h>
 #include <entt/entt.hpp>
-#include <Runtime/ICommand/ICommand.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 namespace cyanvne::ecs
 {
-    /**
-     * @brief 标识符组件。
-     * 用于标记实体的唯一标识符，通常用于在系统中快速查找和引用实体。
-     */
+    namespace commands
+    {
+        class ICommand;
+    }
+
+    struct LocalTransformComponent
+    {
+        glm::vec2 position { 0.0f, 0.0f };
+        glm::vec2 scale { 1.0f, 1.0f };
+        float rotation_degrees = 0.0f;
+        glm::vec2 anchor { 0.5f, 0.5f };
+    };
+
+    struct WorldTransformMatrixComponent
+    {
+        glm::mat3 matrix = glm::mat3(1.0f);
+    };
+
+    struct FinalTransformComponent
+    {
+        SDL_FRect destination_rect {  };
+        double rotation = 0.0;
+        SDL_FPoint center {  };
+    };
+
+    struct LayoutComponent
+    {
+        SDL_FRect area_ratio { 0.5f, 0.5f, 0.1f, 0.1f };
+        SDL_FPoint anchor { 0.5f, 0.5f };
+    };
+
     struct IdentifierComponent
     {
         std::string id;
     };
 
-    /**
-     * @brief 布局组件。
-     * 用于定义实体在窗口中的布局位置和大小比例。
-     * area_ratio 是一个比例矩形，anchor 定义了该矩形的锚点位置。
-     */
-    struct LayoutComponent
+    struct ParentComponent
     {
-        SDL_FRect area_ratio{ 0.5f, 0.5f, 0.1f, 0.1f };
-        SDL_FPoint anchor{ 0.5f, 0.5f };
-    };
-
-
-    /**
-     * @brief 父实体组件。
-     * 标记一个实体拥有一个父实体。
-     */
-    struct ParentComponent {
         entt::entity parent = entt::null;
     };
 
-    /**
-     * @brief 子实体列表组件。
-     * 存储一个实体的所有子实体，方便快速遍历和关系管理。
-     */
-    struct ChildrenComponent {
+    struct ChildrenComponent
+    {
         std::vector<entt::entity> children;
     };
 
-    /**
-     * @brief 局部变换组件。
-     * 存储实体相对于其父实体的“局部”位置、缩放和旋转。
-     * 如果没有父实体，则相对于世界原点。
-     */
-    struct TransformComponent {
-        SDL_FPoint position{ 0.0f, 0.0f };
-        SDL_FPoint scale{ 1.0f, 1.0f };
-        double rotation = 0.0;
-    };
-
-    struct FinalTransformComponent
-    {
-        SDL_FRect destination_rect;
-    };
+    struct VisibleComponent
+    {  };
 
     struct SpriteComponent
     {
         std::string resource_key;
         SDL_FRect source_rect{ 0, 0, 0, 0 };
-
-        SDL_Color color_mod{ 255, 255, 255, 255 }; // RGBA color modulation
+        SDL_Color color_mod{ 255, 255, 255, 255 };
+        int layer = 0;
     };
 
     struct SpriteAnimationComponent
@@ -78,6 +80,33 @@ namespace cyanvne::ecs
         bool loop = true;
     };
 
+    struct CommandPacket
+    {
+        std::unique_ptr<commands::ICommand> command;
+        entt::entity source_entity = entt::null;
+    };
+
+    using CommandQueue = std::deque<CommandPacket>;
+
+    struct ClickableComponent
+    {
+        std::vector<std::shared_ptr<commands::ICommand>> on_left_click;
+        std::vector<std::shared_ptr<commands::ICommand>> on_right_click;
+    };
+
+    struct HasKeyFocus { };
+
+    struct KeyFocusComponent
+    {
+        std::map<SDL_Keycode, std::vector<std::shared_ptr<commands::ICommand>>> key_actions;
+    };
+
+    struct ScrollableComponent
+    {
+        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_up;
+        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_down;
+    };
+
     struct Tween
     {
         enum class Property
@@ -86,7 +115,6 @@ namespace cyanvne::ecs
             TRANSFORM_POSITION_Y,
             SPRITE_ALPHA
         };
-
         enum class EaseType
         {
             LINEAR,
@@ -95,7 +123,6 @@ namespace cyanvne::ecs
             EASE_IN_OUT_QUAD,
             EASE_OUT_SINE
         };
-
         Property target_property;
         EaseType easing_type = EaseType::LINEAR;
         float start_value;
@@ -108,36 +135,5 @@ namespace cyanvne::ecs
     struct TweenListComponent
     {
         std::vector<Tween> tweens;
-    };
-
-    struct VisibleComponent
-    {  };
-
-    struct CommandPacket
-    {
-        std::unique_ptr<commands::ICommand> command;
-        entt::entity source_entity = entt::null;
-    };
-
-    struct HasKeyFocus
-    {  };
-
-    using CommandQueue = std::deque<CommandPacket>;
-
-    struct ClickableComponent
-    {
-        std::vector<std::shared_ptr<commands::ICommand>> on_left_click;
-        std::vector<std::shared_ptr<commands::ICommand>> on_right_click;
-    };
-
-    struct KeyFocusComponent
-    {
-        std::map<SDL_Keycode, std::vector<std::shared_ptr<commands::ICommand>>> key_actions;
-    };
-
-    struct ScrollableComponent
-    {
-        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_up;
-        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_down;
     };
 }

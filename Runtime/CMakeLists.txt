@@ -24,6 +24,7 @@ set(CyanVNERuntime_Require
   lua_library_static
   EnTT::EnTT
         LuaJIT
+        glm::glm
 )
 
 target_link_libraries(CyanVNERuntime PUBLIC ${CyanVNERuntime_Require})

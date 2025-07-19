@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <memory>
-#include "entt/entt.hpp"
 #include <Resources/ICacheResourcesManager/ICacheResourcesManager.h>
 #include <Platform/WindowContext/WindowContext.h>
 #include "Runtime/Components/Components.h"
