@@ -21,6 +21,7 @@ add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 set(CyanVNERuntime_Require
   CyanVNECore
   CyanVNEPlatform
+    CyanVNEAudio
   lua_library_static
   EnTT::EnTT
         LuaJIT::LuaJIT
