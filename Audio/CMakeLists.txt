@@ -11,6 +11,7 @@ set(CyanVNEAudio_Require
         CyanVNECore
         CyanVNEPlatform
         soloud
+        EnTT::EnTT
 )
 
 target_link_libraries(CyanVNEAudio PUBLIC ${CyanVNEAudio_Require})

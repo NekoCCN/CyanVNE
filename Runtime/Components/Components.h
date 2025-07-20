@@ -11,6 +11,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 
+#include "Audio/IAudioEngine/IAudioEngine.h"
+
 namespace cyanvne::ecs
 {
     namespace commands
@@ -136,4 +138,17 @@ namespace cyanvne::ecs
     {
         std::vector<Tween> tweens;
     };
+
+    struct AudioSourceComponent
+    {
+        std::string resource_key;
+        std::string bus_name = "SFX";
+        float volume = 1.0f;
+        bool loop = false;
+        bool play_on_create = true;
+
+        audio::VoiceHandle voice_handle = 0;
+    };
+
+    struct AudioListenerComponent {};
 }
