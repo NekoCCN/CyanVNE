@@ -12,7 +12,58 @@ endif()
 add_subdirectory( "External/boost" )
 
 # LuaJIT
-add_subdirectory( "External/pre_LuaJIT" )
+include(ExternalProject)
+
+set(LUAJIT_SUBMODULE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/External/pre_LuaJIT/LuaJIT)
+set(LUAJIT_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/luajit_install)
+
+if(ANDROID)
+  if(ANDROID_ABI STREQUAL "arm64-v8a")
+    set(LUAJIT_CROSS_PREFIX "aarch64-linux-android-")
+    set(LUAJIT_TARGET_ARCH "arm64")
+  endif()
+  set(LUAJIT_BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -C ${LUAJIT_SUBMODULE_DIR} HOST_CC="gcc" CROSS=${LUAJIT_CROSS_PREFIX} TARGET_SYS=Linux TARGET_ARCH=${LUAJIT_TARGET_ARCH} amalg)
+  set(LUAJIT_INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} -C ${LUAJIT_SUBMODULE_DIR} install DESTDIR=${LUAJIT_INSTALL_DIR} PREFIX=)
+  set(LUAJIT_STATIC_LIB ${LUAJIT_INSTALL_DIR}/lib/libluajit-5.1.a)
+  set(LUAJIT_INCLUDE_DIR ${LUAJIT_INSTALL_DIR}/include/luajit-2.1)
+elseif(WIN32 AND NOT MINGW)
+  message(STATUS "Configuring LuaJIT for Windows (MSVC/Clang) using msvcbuild.bat")
+
+  set(LUAJIT_INSTALL_COMMAND "")
+  set(LUAJIT_BUILD_COMMAND ${LUAJIT_SUBMODULE_DIR}/msvcbuild.bat static)
+  set(LUAJIT_STATIC_LIB ${LUAJIT_SUBMODULE_DIR}/src/lua51.lib)
+  set(LUAJIT_INCLUDE_DIR ${LUAJIT_SUBMODULE_DIR}/src)
+else()
+  message(STATUS "Configuring LuaJIT for Unix-like environment (Linux/macOS/MinGW)")
+
+  set(LUAJIT_BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} -C ${LUAJIT_SUBMODULE_DIR} amalg)
+  set(LUAJIT_INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} -C ${LUAJIT_SUBMODULE_DIR} install DESTDIR=${LUAJIT_INSTALL_DIR} PREFIX=)
+  set(LUAJIT_STATIC_LIB ${LUAJIT_INSTALL_DIR}/lib/libluajit-5.1.a)
+  set(LUAJIT_INCLUDE_DIR ${LUAJIT_INSTALL_DIR}/include/luajit-2.1)
+endif()
+
+
+ExternalProject_Add(
+        luajit_external
+        GIT_REPOSITORY    ${LUAJIT_SUBMODULE_DIR}
+        UPDATE_COMMAND    ""
+        BUILD_COMMAND     ${LUAJIT_BUILD_COMMAND}
+        INSTALL_COMMAND   ${LUAJIT_INSTALL_COMMAND}
+        BUILD_BYPRODUCTS  ${LUAJIT_STATIC_LIB}
+)
+
+add_library(LuaJIT::LuaJIT STATIC IMPORTED GLOBAL)
+
+set_target_properties(LuaJIT::LuaJIT PROPERTIES
+        IMPORTED_LOCATION         "${LUAJIT_STATIC_LIB}"
+        INTERFACE_INCLUDE_DIRECTORIES "${LUAJIT_INCLUDE_DIR}"
+)
+
+add_dependencies(LuaJIT::LuaJIT luajit_external)
+
+if(UNIX)
+  target_link_libraries(LuaJIT::LuaJIT INTERFACE dl m)
+endif()
 
 # Sol2
 add_subdirectory( "External/sol2" )

@@ -23,7 +23,7 @@ set(CyanVNERuntime_Require
   CyanVNEPlatform
   lua_library_static
   EnTT::EnTT
-        LuaJIT
+        LuaJIT::LuaJIT
         glm::glm
 )
 
