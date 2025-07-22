@@ -58,7 +58,7 @@ namespace cyanvne::audio
     {
         if (!sound) return 0;
         VoiceHandle handle = soloud_->play(sound->sound, volume, 0, paused);
-        if (bus != 0) // 0是主总线，默认就在其中，无需添加
+        if (bus != 0)
         {
             soloud_->addVoiceToGroup(bus, handle);
         }
@@ -162,5 +162,23 @@ namespace cyanvne::audio
         {
             soloud_->set3dSourcePosition(handle, x, y, z);
         }
+    }
+
+    void SoloudAudioEngine::stopBus(BusHandle bus)
+    {
+        if (bus != 0)
+        {
+            soloud_->stop(bus);
+        }
+    }
+
+    void SoloudAudioEngine::pauseBus(BusHandle bus)
+    {
+        soloud_->setPause(bus, true);
+    }
+
+    void SoloudAudioEngine::resumeBus(BusHandle bus)
+    {
+        soloud_->setPause(bus, false);
     }
 }

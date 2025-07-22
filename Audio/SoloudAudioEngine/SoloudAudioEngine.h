@@ -46,6 +46,9 @@ namespace cyanvne::audio
         void updateListenerPosition(float x, float y, float z = 0.0f) override;
         void updateSoundPosition(VoiceHandle handle, float x, float y, float z = 0.0f) override;
 
+        void stopBus(BusHandle bus) override;
+        void pauseBus(BusHandle bus) override;
+        void resumeBus(BusHandle bus) override;
     private:
         std::unique_ptr<SoLoud::Soloud> soloud_;
 
