@@ -3,6 +3,8 @@ set(CyanVNEAudio_SRC
         "IAudioEngine/IAudioEngine.h"
         SoloudAudioEngine/SoloudAudioEngine.cpp
         SoloudAudioEngine/SoloudAudioEngine.h
+        AudioManager/AudioManager.cpp
+        AudioManager/AudioManager.h
 )
 
 add_library(CyanVNEAudio STATIC ${CyanVNEAudio_SRC})
@@ -12,6 +14,7 @@ set(CyanVNEAudio_Require
         CyanVNEPlatform
         soloud
         EnTT::EnTT
+        glm::glm
 )
 
 target_link_libraries(CyanVNEAudio PUBLIC ${CyanVNEAudio_Require})

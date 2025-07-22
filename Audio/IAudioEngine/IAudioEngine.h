@@ -44,6 +44,14 @@ namespace cyanvne::audio
 
         virtual void updateListenerPosition(float x, float y, float z = 0.0f) = 0;
         virtual void updateSoundPosition(VoiceHandle handle, float x, float y, float z = 0.0f) = 0;
+
+        virtual void stopBus(BusHandle bus) = 0;
+
+        virtual void pauseBus(BusHandle bus) = 0;
+
+        virtual void resumeBus(BusHandle bus) = 0;
+
+        virtual VoiceHandle play(BusHandle bus, resources::SoLoudWavResource* sound, float volume = 1.0f, bool paused = false) = 0;
     };
 }
 
