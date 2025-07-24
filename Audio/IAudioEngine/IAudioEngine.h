@@ -50,8 +50,6 @@ namespace cyanvne::audio
         virtual void pauseBus(BusHandle bus) = 0;
 
         virtual void resumeBus(BusHandle bus) = 0;
-
-        virtual VoiceHandle play(BusHandle bus, resources::SoLoudWavResource* sound, float volume = 1.0f, bool paused = false) = 0;
     };
 }
 

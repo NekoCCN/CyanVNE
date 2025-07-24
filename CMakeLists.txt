@@ -96,6 +96,9 @@ include_directories( "External/SDL_image/include" )
 # add_subdirectory( External/SDL_mixer )
 # include_directories( External/SDL_mixer/include )
 
+# Bgfx
+add_subdirectory ( "External/bgfx.cmake" )
+
 # ImgUI
 add_subdirectory( "External/pre_imgui" )
 include_directories( "External/pre_imgui" )
