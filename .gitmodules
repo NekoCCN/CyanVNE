@@ -38,3 +38,6 @@
 [submodule "External/glm"]
 	path = External/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "External/bgfx.cmake"]
+	path = External/bgfx.cmake
+	url = https://github.com/bkaradzic/bgfx.cmake.git
