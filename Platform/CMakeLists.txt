@@ -16,6 +16,8 @@ set(CyanVNEPlatform_SRC
   "Monitor/Monitor.cpp"
         ErrorEvent/ErrorEvent.cpp
         ErrorEvent/ErrorEvent.h
+        GraphicsContext/GraphicsContext.cpp
+        GraphicsContext/GraphicsContext.h
 )
 
 add_library(CyanVNEPlatform STATIC ${CyanVNEPlatform_SRC})
@@ -28,6 +30,7 @@ set(CyanVNEPlatform_Require
   imgui
   Boost::lockfree
   Boost::pool
+        bgfx
 )
 
 target_link_libraries(CyanVNEPlatform PUBLIC ${CyanVNEPlatform_Require})
