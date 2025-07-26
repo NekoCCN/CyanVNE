@@ -14,10 +14,20 @@ set(CyanVNEPlatform_SRC
   "EventBus/EventBus.cpp"
   "Monitor/Monitor.h"
   "Monitor/Monitor.cpp"
-        ErrorEvent/ErrorEvent.cpp
         ErrorEvent/ErrorEvent.h
         GraphicsContext/GraphicsContext.cpp
         GraphicsContext/GraphicsContext.h
+        StreamUniversalImpl/StreamUniversalImpl.cpp
+        "StreamUniversalImpl/StreamUniversalImpl.h"
+        "UniversalPathToStream/UniversalPathToStream.h"
+        "Algorithm/Binarization/Binarization.cpp"
+        "Algorithm/Binarization/Binarization.h"
+        "Algorithm/ContourTracing/ContourTracing.cpp"
+        "Algorithm/ContourTracing/ContourTracing.h"
+        Algorithm/Simplification/Simplification.cpp
+        Algorithm/Simplification/Simplification.h
+        Algorithm/Polypartition/polypartition.cpp
+        Algorithm/Polypartition/polypartition.h
 )
 
 add_library(CyanVNEPlatform STATIC ${CyanVNEPlatform_SRC})
@@ -31,6 +41,8 @@ set(CyanVNEPlatform_Require
   Boost::lockfree
   Boost::pool
         bgfx
+        glm::glm
+        polypartition
 )
 
 target_link_libraries(CyanVNEPlatform PUBLIC ${CyanVNEPlatform_Require})

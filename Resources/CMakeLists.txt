@@ -2,14 +2,11 @@
 include_directories( "./" )
 
 set(CyanVNEResources_SRC
-  "StreamUniversalImpl/StreamUniversalImpl.h"
-  "StreamUniversalImpl/StreamUniversalImpl.cpp"
   "ThemeMinimumRequire/ThemeMinimumRequire.h"
   "ResourcesPacker/ResourcesPacker.h"
   "ResourcesPacker/ResourcesPacker.cpp"
   "ResourcesException/ResourcesException.h"
   "ResourcesDefination/ResourcesDefination.h"
-  "UniversalPathToStream/UniversalPathToStream.h"
   "ThemeResourcesPacker/ThemeResourcesPacker.cpp"
   "ThemeResourcesPacker/ThemeResourcesPacker.h"
   "ResourcesManager/ResourcesManager.h"

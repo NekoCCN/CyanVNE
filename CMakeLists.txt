@@ -98,10 +98,16 @@ include_directories( "External/SDL_image/include" )
 
 # Bgfx
 add_subdirectory ( "External/bgfx.cmake" )
+include_directories ( "External/bgfx.cmake/bgfx/include" )
+include_directories ( "External/bgfx.cmake/bx/include" )
+include_directories ( "External/bgfx.cmake/bimg/include" )
 
 # ImgUI
 add_subdirectory( "External/pre_imgui" )
 include_directories( "External/pre_imgui" )
+
+# PolyPartition
+add_subdirectory( "External/pre_polypartition" )
 
 # SoLoud
 add_compile_definitions ( WITH_MINIAUDIO )
