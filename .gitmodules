@@ -41,3 +41,6 @@
 [submodule "External/bgfx.cmake"]
 	path = External/bgfx.cmake
 	url = https://github.com/bkaradzic/bgfx.cmake.git
+[submodule "External/pre_polypartition/polypartition"]
+	path = External/pre_polypartition/polypartition
+	url = https://github.com/ivanfratric/polypartition.git
