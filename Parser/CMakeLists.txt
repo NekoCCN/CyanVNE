@@ -9,8 +9,8 @@ set(CyanVNEParser_SRC
   "ParserUtil/ParserUtil.cpp"
   "ThemeConfig/ThemeConfig.h"
   "ThemeConfig/ThemeConfig.cpp"
-  "ThemeConfigParser/ThemeConfigParser.h"
-  "ThemeConfigParser/ThemeConfigParser.cpp"
+  "ThemeConfig/ThemeConfigParser/ThemeConfigParser.h"
+  "ThemeConfig/ThemeConfigParser/ThemeConfigParser.cpp"
   "Framework/Framework.h"
   "Framework/Framework.cpp"
   "ParserFactories/ParserFactories.h"
@@ -21,8 +21,8 @@ set(CyanVNEParser_SRC
         Ecs/ComponentParsers.h
         CommandsParser/CommandsParser.cpp
         CommandsParser/CommandsParser.h
-        CommandParser/CommandParser.cpp
-        CommandParser/CommandParser.h
+        CommandsParser/CommandParser/CommandParser.cpp
+        CommandsParser/CommandParser/CommandParser.h
         Ecs/ComponentEmplacer.h
 )
 
