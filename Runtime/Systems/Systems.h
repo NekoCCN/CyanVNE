@@ -7,11 +7,24 @@
 
 namespace cyanvne
 {
-    namespace platform { class WindowContext; class EventBus; }
-    namespace resources { class ICacheResourcesManager; }
-    namespace runtime { class GameStateManager;
-        namespace ecs { class Scene; } }
+    namespace platform
+    { class WindowContext;
+        class EventBus; }
+
+    namespace resources
+    { class ICacheResourcesManager; }
+
+    namespace runtime
+    {
+        class GameStateManager;
+
+        namespace ecs
+        { class Scene; }
+    }
 }
+
+namespace cyanvne::audio
+{ class AudioManager; }
 
 namespace cyanvne::ecs
 {
@@ -38,6 +51,8 @@ namespace cyanvne::ecs::systems
     void TweenSystem(entt::registry& registry, float delta_time);
 
     void CommandSystem(entt::registry& registry, runtime::ecs::Scene& scene, runtime::GameStateManager& gsm, platform::EventBus& bus);
+
+    void AudioSystem(entt::registry& registry, audio::AudioManager& audio_manager);
 
     class InteractionSystem
     {
