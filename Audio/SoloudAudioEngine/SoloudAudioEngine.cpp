@@ -28,11 +28,12 @@ namespace cyanvne::audio
 
     BusHandle SoloudAudioEngine::createBus(std::string_view name)
     {
-        std::string name_str(name);
-        if (bus_map_.contains(name_str))
+        if (bus_map_.contains(name))
         {
-            return bus_map_.at(name_str);
+            return bus_map_.at(std::string(name));
         }
+
+        std::string name_str(name);
         BusHandle handle = soloud_->createVoiceGroup();
         bus_map_[name_str] = handle;
         return handle;
@@ -40,7 +41,7 @@ namespace cyanvne::audio
 
     BusHandle SoloudAudioEngine::getBus(std::string_view name) const
     {
-        auto it = bus_map_.find(std::string(name));
+        auto it = bus_map_.find(name);
         return (it != bus_map_.end()) ? it->second : 0;
     }
 
@@ -56,7 +57,9 @@ namespace cyanvne::audio
 
     VoiceHandle SoloudAudioEngine::play(BusHandle bus, resources::SoLoudWavResource* sound, float volume, bool paused)
     {
-        if (!sound) return 0;
+        if (!sound)
+            return 0;
+
         VoiceHandle handle = soloud_->play(sound->sound, volume, 0, paused);
         if (bus != 0)
         {
@@ -81,7 +84,6 @@ namespace cyanvne::audio
     {
         if (!sound)
             return;
-
         soloud_->play(sound->sound, volume);
     }
 
@@ -174,11 +176,17 @@ namespace cyanvne::audio
 
     void SoloudAudioEngine::pauseBus(BusHandle bus)
     {
-        soloud_->setPause(bus, true);
+        if (bus != 0)
+        {
+            soloud_->setPause(bus, true);
+        }
     }
 
     void SoloudAudioEngine::resumeBus(BusHandle bus)
     {
-        soloud_->setPause(bus, false);
+        if (bus != 0)
+        {
+            soloud_->setPause(bus, false);
+        }
     }
 }
