@@ -10,6 +10,7 @@ endif()
 
 # Boost
 add_subdirectory( "External/boost" )
+include_directories( "External/boost/fiber/examples" )
 
 # LuaJIT
 include(ExternalProject)

@@ -8,8 +8,6 @@ set(CyanVNEPlatform_SRC
   "GuiContext/GuiContext.h"
   "GuiContext/GuiContext.cpp"
   "PlatformException/PlatformException.h"
-  "BasicRender/BasicRender.h"
-  "BasicRender/BasicRender.cpp"
   "EventBus/EventBus.h"
   "EventBus/EventBus.cpp"
   "Monitor/Monitor.h"
@@ -28,6 +26,11 @@ set(CyanVNEPlatform_SRC
         Algorithm/Simplification/Simplification.h
         Algorithm/Polypartition/polypartition.cpp
         Algorithm/Polypartition/polypartition.h
+        Thread/UnifiedConcurrencyManager.h
+        GuiContext/Detail/imgui_impl_bgfx.cpp
+        GuiContext/Detail/imgui_impl_bgfx.h
+        GuiContext/Detail/fs_ocornut_imgui.bin.h
+        GuiContext/Detail/vs_ocornut_imgui.bin.h
 )
 
 add_library(CyanVNEPlatform STATIC ${CyanVNEPlatform_SRC})
@@ -43,6 +46,8 @@ set(CyanVNEPlatform_Require
         bgfx
         glm::glm
         polypartition
+        Boost::asio
+        Boost::fiber
 )
 
 target_link_libraries(CyanVNEPlatform PUBLIC ${CyanVNEPlatform_Require})

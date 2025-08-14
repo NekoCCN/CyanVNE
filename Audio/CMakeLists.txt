@@ -3,7 +3,6 @@ set(CyanVNEAudio_SRC
         "IAudioEngine/IAudioEngine.h"
         SoloudAudioEngine/SoloudAudioEngine.cpp
         SoloudAudioEngine/SoloudAudioEngine.h
-        AudioManager/AudioManager.cpp
         AudioManager/AudioManager.h
 )
 

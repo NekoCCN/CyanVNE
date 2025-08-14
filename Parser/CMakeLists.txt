@@ -13,17 +13,6 @@ set(CyanVNEParser_SRC
   "ThemeConfig/ThemeConfigParser/ThemeConfigParser.cpp"
   "Framework/Framework.h"
   "Framework/Framework.cpp"
-  "ParserFactories/ParserFactories.h"
-        "DataStructures/GameData.h"
-        GameDataParsers/GameDataParsers.cpp
-        GameDataParsers/GameDataParsers.h
-        Ecs/ComponentParsers.cpp
-        Ecs/ComponentParsers.h
-        CommandsParser/CommandsParser.cpp
-        CommandsParser/CommandsParser.h
-        CommandsParser/CommandParser/CommandParser.cpp
-        CommandsParser/CommandParser/CommandParser.h
-        Ecs/ComponentEmplacer.h
 )
 
 add_library(CyanVNEParser STATIC ${CyanVNEParser_SRC})
