@@ -1,9 +1,3 @@
-//
-// Created by unirz on 2025/8/14.
-//
-
-#include "imgui_impl_bgfx.h"
-
 // Derived from this Gist by Richard Gale:
 //     https://gist.github.com/RichardGale/6e2b74bc42b3005e08397236e4be0fd0
 
@@ -137,7 +131,7 @@ bool ImGui_Implbgfx_CreateFontsTexture()
             0, bgfx::copy(pixels, width * height * 4));
 
     // Store our identifier
-    io.Fonts->TexID = (void*)(intptr_t)g_FontTexture.idx;
+    io.Fonts->TexID = g_FontTexture.idx;
 
     return true;
 }
