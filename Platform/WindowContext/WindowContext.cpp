@@ -131,6 +131,8 @@ WindowContext::WindowContext(
         throw cyanvne::exception::platformexception::CreateWindowContextException("Failed to create frame buffer");
     }
 
+    renderer_type_ = bgfx::getCaps()->rendererType;
+
     showWindow();
 }
 

@@ -1,4 +1,8 @@
 #include "GuiContext.h"
+#include "Core/Logger/Logger.h"
+#include "Core/ViewID/ViewID.h"
+#include <bx/platform.h>
+#include <Platform/PlatformException/PlatformException.h>
 
 cyanvne::platform::GuiContext::GuiContext(const std::shared_ptr<WindowContext>& window,
     const std::vector<uint8_t>& font_data,
@@ -16,9 +20,33 @@ cyanvne::platform::GuiContext::GuiContext(const std::shared_ptr<WindowContext>& 
     core::GlobalLogger::getCoreLogger()->info("GUI Theme : Light");
     ImGui::StyleColorsLight();
 
-    ImGui_ImplSDL3_InitForSDLRenderer(window->getWindowHinding(), window->getRendererHinding());
-    ImGui_ImplSDLRenderer3_Init(window->getRendererHinding());
+    ImGui_Implbgfx_Init((int16_t)core::RenderLayer::UI);
+    bgfx::RendererType::Enum renderer_type = window->getRendererType();
+    switch (renderer_type)
+    {
+        case bgfx::RendererType::OpenGL:
+            ImGui_ImplSDL3_InitForOpenGL(window->getWindowHandle(), nullptr);
+            break;
+        case bgfx::RendererType::Vulkan:
+            ImGui_ImplSDL3_InitForVulkan(window->getWindowHandle());
+            break;
+        case bgfx::RendererType::Direct3D11:
+            ImGui_ImplSDL3_InitForD3D(window->getWindowHandle());
+            break;
+        case bgfx::RendererType::Direct3D12:
+            ImGui_ImplSDL3_InitForD3D(window->getWindowHandle());
+            break;
+        case bgfx::RendererType::Metal:
+            ImGui_ImplSDL3_InitForMetal(window->getWindowHandle());
+            break;
+        default:
+            core::GlobalLogger::getCoreLogger()->error("Unsupported renderer type for ImGui initialization: {}", bgfx::getRendererName(renderer_type));
+            throw cyanvne::exception::platformexception::CreateWindowContextException("Unsupported renderer type for ImGui initialization");
+    }
 
+
+    int32_t h, w;
+    window->getWindowSize(&w, &h);
 
     if (font_size_ > 0)
     {
@@ -29,12 +57,10 @@ cyanvne::platform::GuiContext::GuiContext(const std::shared_ptr<WindowContext>& 
             font_size_, size_pixels);
 
         io->Fonts->AddFontFromMemoryTTF(font_data_, static_cast<int>(font_size_), size_pixels);
-        ImGui::GetIO().FontGlobalScale = calculateScreenScale(static_cast<int>(window->getWindowRect().w),
-            static_cast<int>(window->getWindowRect().h), size_pixels);
+        ImGui::GetIO().FontGlobalScale = calculateScreenScale(w, h, size_pixels);
     }
 
-    ImGui::GetIO().FontGlobalScale = calculateScreenScale(static_cast<float>(window->getWindowRect().w),
-        static_cast<float>(window->getWindowRect().h), font_pixels_size_);
+    ImGui::GetIO().FontGlobalScale = calculateScreenScale(w, h, font_pixels_size_);
 
     setupImGuiStyle(false, 0.7f);
 }

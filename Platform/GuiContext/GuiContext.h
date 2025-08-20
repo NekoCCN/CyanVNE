@@ -9,7 +9,8 @@
 #include <SDL3/SDL_opengl.h>
 #endif
 #include <Platform/WindowContext/WindowContext.h>
-#include <Platform/BasicRender/BasicRender.h>
+#include <backends/imgui_impl_sdl3.h>
+#include "Detail/imgui_impl_bgfx.h"
 #include <algorithm>
 #include <memory>
 #include <mutex>
@@ -19,7 +20,7 @@ namespace cyanvne
 {
     namespace platform
     {
-        class GuiContext : public basicrender::IChangeableWindowSize
+        class GuiContext
         {
         private:
             inline static std::mutex _mutex;
@@ -32,7 +33,7 @@ namespace cyanvne
 
             float font_pixels_size_ = 0;
 
-            static float calculateScreenScale(const float screen_width, const float screen_height, const float base_font_size = 30.0f)
+            static float calculateScreenScale(const int32_t& screen_width, const int32_t& screen_height, const float base_font_size = 30.0f)
             {
                 constexpr float reference_width = 1920.0f;
                 constexpr float reference_height = 1080.0f;
@@ -106,17 +107,17 @@ namespace cyanvne
                 style.ScrollbarRounding = 18.0f;
             }
 
-            void whenChangedWindowSize(int new_w, int new_h) override
+            void whenChangedWindowSize(int new_w, int new_h)
             {
                 ImGui::GetIO().FontGlobalScale = calculateScreenScale(static_cast<float>(new_w),
                     static_cast<float>(new_h), font_pixels_size_);
             }
 
-            ~GuiContext() override
+            ~GuiContext()
             {
                 // Notice : This code will clean up the memory pointed to by the font pointer
-                ImGui_ImplSDLRenderer3_Shutdown();
                 ImGui_ImplSDL3_Shutdown();
+                ImGui_Implbgfx_Shutdown();
                 ImGui::DestroyContext();
             }
         };
