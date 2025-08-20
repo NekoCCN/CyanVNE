@@ -4,6 +4,7 @@
 #include <string>
 #include <bx/platform.h>
 #include "Core/PathToStream/PathToStream.h"
+#include "Platform/StreamUniversalImpl/StreamUniversalImpl.h"
 
 namespace cyanvne
 {
@@ -15,11 +16,11 @@ namespace cyanvne
             UniversalPathToStream()
             {
                 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
-                    char* path = SDL_GetBasePath();
+                    const char* path = SDL_GetBasePath();
                     if (path)
                     {
                         base_path_ = path;
-                        SDL_free(path);
+                        SDL_free((void*)path);
                     }
                 #endif
             }
