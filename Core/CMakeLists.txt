@@ -11,6 +11,7 @@ set(CyanVNECore_SRC
   "MemoryStreamImpl/MemoryStreamImpl.cpp"
   "PathToStream/PathToStream.h"
   "Stream/Stream.cpp"
+        ViewID/ViewID.h
 )
 
 add_library(CyanVNECore STATIC ${CyanVNECore_SRC})

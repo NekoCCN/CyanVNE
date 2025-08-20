@@ -52,8 +52,7 @@
             "inherits": "windows-vs-base",
             "binaryDir": "${sourceDir}/build/debug-msvc-vs",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/Debug/generators/conan_toolchain.cmake"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
@@ -63,8 +62,7 @@
             "inherits": "windows-vs-base",
             "binaryDir": "${sourceDir}/build/release-msvc-vs",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/Release/generators/conan_toolchain.cmake"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
@@ -74,8 +72,7 @@
             "inherits": "linux-base",
             "binaryDir": "${sourceDir}/build/debug-linux",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/build/Debug/debug-linux/generators/conan_toolchain.cmake"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
@@ -85,8 +82,7 @@
             "inherits": "linux-base",
             "binaryDir": "${sourceDir}/build/release-linux",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/Release/build/generators/conan_toolchain.cmake"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {

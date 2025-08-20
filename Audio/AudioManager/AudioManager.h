@@ -29,13 +29,11 @@ namespace cyanvne::audio
     class AudioManager
     {
     public:
-        // Constructor now takes the concrete engine type by value and moves it.
         AudioManager(T engine,
                      std::shared_ptr<resources::UnifiedCacheManager> cache_manager,
                      platform::EventBus& event_bus);
         ~AudioManager();
 
-        // Deleted copy constructor and assignment operator to prevent copying.
         AudioManager(const AudioManager&) = delete;
         AudioManager& operator=(const AudioManager&) = delete;
 
@@ -69,8 +67,6 @@ namespace cyanvne::audio
         // Maps a string tag to a currently playing voice for easy control.
         std::map<std::string, VoiceHandle> tagged_voices_;
     };
-
-    // --- Implementation of the template class ---
 
     template <AudioEngine T>
     AudioManager<T>::AudioManager(T engine,
@@ -139,7 +135,8 @@ namespace cyanvne::audio
         try
         {
             auto sound_res = cache_manager_->get<resources::SoLoudWavResource>(event.resource_key);
-            if (!sound_res) return;
+            if (!sound_res)
+                return;
 
             // Ensure the bus exists, creating it if necessary.
             auto bus_handle = engine_.getBus(event.bus_name);
@@ -160,10 +157,8 @@ namespace cyanvne::audio
                 handle = engine_.play(bus_handle, sound_res.get(), event.volume);
             }
 
-            // If a tag is provided, manage the tagged voice.
             if (event.tag.has_value() && handle != 0)
             {
-                // If a sound with the same tag is already playing, stop it.
                 if (tagged_voices_.contains(event.tag.value()))
                 {
                     engine_.stop(tagged_voices_[event.tag.value()]);

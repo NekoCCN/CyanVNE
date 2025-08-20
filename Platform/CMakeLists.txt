@@ -13,8 +13,6 @@ set(CyanVNEPlatform_SRC
   "Monitor/Monitor.h"
   "Monitor/Monitor.cpp"
         ErrorEvent/ErrorEvent.h
-        GraphicsContext/GraphicsContext.cpp
-        GraphicsContext/GraphicsContext.h
         StreamUniversalImpl/StreamUniversalImpl.cpp
         "StreamUniversalImpl/StreamUniversalImpl.h"
         "UniversalPathToStream/UniversalPathToStream.h"
@@ -31,6 +29,8 @@ set(CyanVNEPlatform_SRC
         GuiContext/Detail/imgui_impl_bgfx.h
         GuiContext/Detail/fs_ocornut_imgui.bin.h
         GuiContext/Detail/vs_ocornut_imgui.bin.h
+        FontManager/FontManager.cpp
+        FontManager/FontManager.h
 )
 
 add_library(CyanVNEPlatform STATIC ${CyanVNEPlatform_SRC})
