@@ -14,8 +14,11 @@ set(CyanVNERuntime_SRC
   "Systems/Systems.cpp"
   "Scene/Scene.cpp"
  "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h" "IGameState/IGameState.cpp" "Commands/Commands.h" "Events/Events.h"
-        RuntimeException/RuntimeException.h
-        Events/AudioEvents.h)
+        "RuntimeException/RuntimeException.h"
+        "Events/AudioEvents.h"
+        "RendererService/RendererService.cpp"
+        "RendererService/RendererService.h"
+)
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 
@@ -25,8 +28,8 @@ set(CyanVNERuntime_Require
     CyanVNEAudio
   lua_library_static
   EnTT::EnTT
-        LuaJIT::LuaJIT
         glm::glm
+        CyanVNEShaders
 )
 
 target_link_libraries(CyanVNERuntime PUBLIC ${CyanVNERuntime_Require})

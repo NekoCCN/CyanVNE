@@ -90,7 +90,7 @@
             "displayName": "Release (MSVC Ninja)",
             "description": "Release build for Windows using the Ninja generator with MSVC.",
             "inherits": "windows-ninja-base",
-            "binaryDir": "${sourceDir}/build/release-msvc-ninja",
+            "binaryDir": "${sourceDir}/build/release-clang-ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_CXX_STANDARD": "23",
@@ -103,12 +103,38 @@
             "displayName": "Debug (MSVC Ninja)",
             "description": "Debug build for Windows using the Ninja generator with MSVC.",
             "inherits": "windows-ninja-base",
-            "binaryDir": "${sourceDir}/build/debug-msvc-ninja",
+            "binaryDir": "${sourceDir}/build/debug-clang-ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_STANDARD": "23",
                 "CMAKE_CXX_COMPILER": "clang++.exe",
                 "CMAKE_C_COMPILER": "clang.exe"
+            }
+        },
+        {
+            "name": "debug-msvc-ninja",
+            "displayName": "Debug (MSVC with Ninja)",
+            "description": "Debug build for Windows using Ninja with the MSVC compiler.",
+            "inherits": "windows-ninja-base",
+            "binaryDir": "${sourceDir}/build/debug-msvc-ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_FLAGS": "/Zc:__cplusplus /Zc:preprocessor"
+            }
+        },
+        {
+            "name": "release-msvc-ninja",
+            "displayName": "Debug (MSVC with Ninja)",
+            "description": "Debug build for Windows using Ninja with the MSVC compiler.",
+            "inherits": "windows-ninja-base",
+            "binaryDir": "${sourceDir}/buffoild/debug-msvc-ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_FLAGS": "/Zc:__cplusplus /Zc:preprocessor"
             }
         }
     ]
