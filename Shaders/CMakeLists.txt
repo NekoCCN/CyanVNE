@@ -6,17 +6,17 @@ if(NOT EXISTS ${BGFX_SHADER_INCLUDE_PATH})
   message(FATAL_ERROR "BGFX include directory not found at '${BGFX_SHADER_INCLUDE_PATH}'. Please correct the path in Shaders/CMakeLists.txt.")
 endif()
 
-file(GLOB_RECURSE VARYING_FILES "*/varying.def.sc")
+file(GLOB_RECURSE VARYING_FILES "*/varying.def.glsl")
 
 foreach(VARYING_FILE ${VARYING_FILES})
   get_filename_component(SHADER_DIR ${VARYING_FILE} DIRECTORY)
   message(STATUS "Found shader directory: ${SHADER_DIR}")
 
-  file(GLOB SHADER_SOURCES "${SHADER_DIR}/*.sc")
+  file(GLOB SHADER_SOURCES "${SHADER_DIR}/*.glsl")
 
   foreach(SHADER_FILE ${SHADER_SOURCES})
     get_filename_component(SHADER_NAME ${SHADER_FILE} NAME)
-    if(SHADER_NAME STREQUAL "varying.def.sc")
+    if(SHADER_NAME STREQUAL "varying.def.glsl")
       continue()
     endif()
 
