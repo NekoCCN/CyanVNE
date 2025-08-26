@@ -2,22 +2,16 @@
 set(CyanVNERuntime_SRC
   "GameStateManager/GameStateManager.h"
   "GameStateManager/GameStateManager.cpp"
-  "IGameState/IGameState.h"
-  "GuiDebugState/GuiDebugState.h"
-  "GuiDebugState/GuiDebugState.cpp"
+  "EcsGameState/EcsGameState.h"
   "RuntimeUtils/RuntimeUtils.h"
   "RuntimeUtils/RuntimeUtils.cpp"
-  "MainMenuState/MainMenuState.h"
   "Components/Components.h"
-  "Scene/Scene.h"
   "Systems/Systems.h"
   "Systems/Systems.cpp"
-  "Scene/Scene.cpp"
- "GuiSystem/GuiSystem.h" "GuiSystem/GuiSystem.cpp" "IGuiWindow/IGuiWindow.h" "ICommand/ICommand.h" "IGameState/IGameState.cpp" "Commands/Commands.h" "Events/Events.h"
+ "EcsGameState/EcsGameState.cpp"
         "RuntimeException/RuntimeException.h"
-        "Events/AudioEvents.h"
-        "RendererService/RendererService.cpp"
-        "RendererService/RendererService.h"
+        Renderer/MeshBatchRenderer/MeshBatchRenderer.cpp
+        Renderer/MeshBatchRenderer/MeshBatchRenderer.h
 )
 
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})

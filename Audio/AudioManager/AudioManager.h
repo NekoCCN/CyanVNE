@@ -7,7 +7,6 @@
 
 #include "Platform/EventBus/EventBus.h"
 #include "Resources/UnifiedCacheManager/UnifiedCacheManager.h"
-#include "Runtime/Events/AudioEvents.h"
 #include <entt/entt.hpp>
 #include <memory>
 #include <vector>
@@ -15,6 +14,7 @@
 #include <map>
 #include "Audio/IAudioEngine/IAudioEngine.h"
 #include "Runtime/Components/Components.h"
+#include "Audio/Events/AudioEvents.h"
 
 namespace cyanvne::audio
 {
@@ -106,7 +106,7 @@ namespace cyanvne::audio
     {
         disconnectFromRegistry();
         // Connect the onAudioSourceRemoved method to the registry's destruction signal for AudioSourceComponent.
-        remove_connection_ = registry.on_destroy<ecs::AudioSourceComponent>().connect<&AudioManager<T>::onAudioSourceRemoved>(this);
+        remove_connection_ = registry.on_destroy<runtime::AudioSourceComponent>().connect<&AudioManager<T>::onAudioSourceRemoved>(this);
     }
 
     template <AudioEngine T>
@@ -122,7 +122,7 @@ namespace cyanvne::audio
     void AudioManager<T>::onAudioSourceRemoved(entt::registry& registry, entt::entity entity)
     {
         // When an audio source component is removed, stop its associated sound.
-        auto& source = registry.get<ecs::AudioSourceComponent>(entity);
+        auto& source = registry.get<runtime::AudioSourceComponent>(entity);
         if (source.voice_handle != 0)
         {
             engine_.stop(source.voice_handle);

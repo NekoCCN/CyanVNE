@@ -4,6 +4,7 @@ set(CyanVNEAudio_SRC
         SoloudAudioEngine/SoloudAudioEngine.cpp
         SoloudAudioEngine/SoloudAudioEngine.h
         AudioManager/AudioManager.h
+        Events/AudioEvents.h
 )
 
 add_library(CyanVNEAudio STATIC ${CyanVNEAudio_SRC})

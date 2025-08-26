@@ -18,7 +18,7 @@ set(CyanVNEResources_SRC
   "UnifiedCacheManager/UnifiedCacheManager.cpp"
  "ICachedResource/ICachedResource.h"
  "ResourceTypes/ResourceTypes.h"
- "ResourceTypes/ResourceType.cpp" "ICacheResourcesManager/ICacheResourcesManager.h")
+ "ResourceTypes/ResourceType.cpp")
 
 add_library(CyanVNEResources STATIC ${CyanVNEResources_SRC})
 
@@ -26,6 +26,7 @@ set(CyanVNEResources_Require
   CyanVNECore
   CyanVNEParser
   SDL3-static
+        bgfx
 )
 
 target_link_libraries(CyanVNEResources PUBLIC ${CyanVNEResources_Require})
