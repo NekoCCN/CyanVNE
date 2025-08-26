@@ -1,7 +1,8 @@
 #pragma once
+
 #include <Core/Stream/Stream.h>
 #include <Resources/ResourcesDefination/ResourcesDefination.h>
-#include <Core/MemoryStreamImpl/MemoryStreamImpl.h>
+#include <Core/PathToStream/PathToStream.h>
 #include <vector>
 #include <string>
 #include <map>
@@ -15,8 +16,8 @@ namespace cyanvne
         class ResourcesManager
         {
         private:
-            std::shared_ptr<core::stream::InStreamInterface> in_stream_;
-            mutable std::mutex stream_mutex_;
+            std::shared_ptr<core::IPathToStream> path_to_stream_;
+            std::string resource_file_path_;
 
             ResourcesFileHeader file_header_;
             std::vector<ResourceDefinition> definitions_;
@@ -28,7 +29,7 @@ namespace cyanvne
 
             void loadDefinitions();
         public:
-            explicit ResourcesManager(std::shared_ptr<core::stream::InStreamInterface> stream);
+            explicit ResourcesManager(const std::string& resource_file_path, std::shared_ptr<core::IPathToStream> path_to_stream);
             ~ResourcesManager() = default;
 
             ResourcesManager(const ResourcesManager&) = delete;
