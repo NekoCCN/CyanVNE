@@ -3,12 +3,21 @@
 #include <vector>
 #include <Resources/ResourcesManager/ResourcesManager.h>
 #include <soloud_wav.h>
-#include <SDL3/SDL.h>
+#include <bgfx/bgfx.h>
 
 namespace cyanvne
 {
     namespace resources
     {
+        enum class ImageLoader
+        {
+
+            // Bimg
+            INTERNAL,
+            // SDL_Image
+            EXTENDED
+        };
+
         class RawDataResource : public ICachedResource
         {
         public:
@@ -19,9 +28,13 @@ namespace cyanvne
 
         class TextureResource : public ICachedResource
         {
+        private:
+            uint32_t texture_size_bytes_ = 0;
         public:
-            SDL_Texture* texture = nullptr;
-            explicit TextureResource(const std::vector<uint8_t>& raw_data, SDL_Renderer* renderer);
+            bgfx::TextureHandle texture_handle = BGFX_INVALID_HANDLE;
+
+            explicit TextureResource(const std::vector<uint8_t>& raw_data,
+                                     ImageLoader loader = ImageLoader::INTERNAL);
             ~TextureResource() override;
             size_t getSizeInBytes() const override;
         };
