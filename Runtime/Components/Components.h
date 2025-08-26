@@ -10,66 +10,57 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
-
 #include "Audio/IAudioEngine/IAudioEngine.h"
+#include "Runtime/Renderer/MeshBatchRenderer/MeshBatchRenderer.h"
+#include <variant>
 
-namespace cyanvne::ecs
+namespace cyanvne::runtime
 {
-    namespace commands
+    struct MeshComponent
     {
-        class ICommand;
-    }
-
-    struct LocalTransformComponent
-    {
-        glm::vec2 position { 0.0f, 0.0f };
-        glm::vec2 scale { 1.0f, 1.0f };
-        float rotation_degrees = 0.0f;
-        glm::vec2 anchor { 0.5f, 0.5f };
+        std::vector<MeshBatchRenderer::PosTexColorVertex> vertices;
+        std::vector<uint32_t> indices;
     };
 
-    struct WorldTransformMatrixComponent
+    struct PinnedTexture
     {
-        glm::mat3 matrix = glm::mat3(1.0f);
+        resources::PinnedResourceHandle data_handle;
+        bgfx::TextureHandle texture_handle = BGFX_INVALID_HANDLE;
+
+        PinnedTexture() = default;
+        PinnedTexture(const PinnedTexture&) = delete;
+        PinnedTexture& operator=(const PinnedTexture&) = delete;
+        PinnedTexture(PinnedTexture&& other) noexcept;
+        PinnedTexture& operator=(PinnedTexture&& other) noexcept;
+        ~PinnedTexture();
     };
 
-    struct FinalTransformComponent
+    struct MaterialComponent
     {
-        SDL_FRect destination_rect {  };
-        double rotation = 0.0;
-        SDL_FPoint center {  };
-    };
+        enum class LoadState
+        {
+            Unloaded,
+            Loading,
+            Loaded,
+            Failed
+        };
 
-    struct LayoutComponent
-    {
-        SDL_FRect area_ratio { 0.5f, 0.5f, 0.1f, 0.1f };
-        SDL_FPoint anchor { 0.5f, 0.5f };
-    };
+        std::string texture_atlas_alias;
+        bool is_pinned = false;
 
-    struct IdentifierComponent
-    {
-        std::string id;
-    };
+        LoadState load_state = LoadState::Unloaded;
 
-    struct ParentComponent
-    {
-        entt::entity parent = entt::null;
-    };
+        using ResourceVariant = std::variant<std::monostate,
+                                                PinnedTexture,
+                                                resources::ResourceHandle<resources::TextureResource>>;
+        ResourceVariant resource_handle;
 
-    struct ChildrenComponent
-    {
-        std::vector<entt::entity> children;
-    };
+        glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-    struct VisibleComponent
-    {  };
-
-    struct SpriteComponent
-    {
-        std::string resource_key;
-        SDL_FRect source_rect{ 0, 0, 0, 0 };
-        SDL_Color color_mod{ 255, 255, 255, 255 };
-        int layer = 0;
+        explicit MaterialComponent(std::string alias, bool pinned = false)
+                : texture_atlas_alias(std::move(alias)),
+                  is_pinned(pinned)
+        {}
     };
 
     struct SpriteAnimationComponent
@@ -80,63 +71,6 @@ namespace cyanvne::ecs
         int current_frame = 0;
         bool is_playing = true;
         bool loop = true;
-    };
-
-    struct CommandPacket
-    {
-        std::unique_ptr<commands::ICommand> command;
-        entt::entity source_entity = entt::null;
-    };
-
-    using CommandQueue = std::deque<CommandPacket>;
-
-    struct ClickableComponent
-    {
-        std::vector<std::shared_ptr<commands::ICommand>> on_left_click;
-        std::vector<std::shared_ptr<commands::ICommand>> on_right_click;
-    };
-
-    struct HasKeyFocus { };
-
-    struct KeyFocusComponent
-    {
-        std::map<SDL_Keycode, std::vector<std::shared_ptr<commands::ICommand>>> key_actions;
-    };
-
-    struct ScrollableComponent
-    {
-        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_up;
-        std::vector<std::shared_ptr<commands::ICommand>> on_scroll_down;
-    };
-
-    struct Tween
-    {
-        enum class Property
-        {
-            TRANSFORM_POSITION_X,
-            TRANSFORM_POSITION_Y,
-            SPRITE_ALPHA
-        };
-        enum class EaseType
-        {
-            LINEAR,
-            EASE_IN_QUAD,
-            EASE_OUT_QUAD,
-            EASE_IN_OUT_QUAD,
-            EASE_OUT_SINE
-        };
-        Property target_property;
-        EaseType easing_type = EaseType::LINEAR;
-        float start_value;
-        float end_value;
-        float duration;
-        float elapsed_time = 0.0f;
-        bool is_finished = false;
-    };
-
-    struct TweenListComponent
-    {
-        std::vector<Tween> tweens;
     };
 
     struct AudioSourceComponent
