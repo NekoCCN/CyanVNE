@@ -1,7 +1,3 @@
-//
-// Created by Ext Culith on 2025/7/21.
-//
-
 #ifndef AUDIOMANAGER_H
 #define AUDIOMANAGER_H
 
@@ -12,19 +8,13 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <optional>
 #include "Audio/IAudioEngine/IAudioEngine.h"
 #include "Runtime/Components/Components.h"
 #include "Audio/Events/AudioEvents.h"
 
 namespace cyanvne::audio
 {
-    /**
-     * @brief Manages audio playback and resources using a specific audio engine.
-     *
-     * This is a template class constrained by the `AudioEngine` concept. The specific
-     * engine (e.g., SoloudAudioEngine) must be provided at compile time.
-     * @tparam T The audio engine type, which must satisfy the `audio::AudioEngine` concept.
-     */
     template <AudioEngine T>
     class AudioManager
     {
@@ -39,24 +29,20 @@ namespace cyanvne::audio
 
         std::shared_ptr<resources::UnifiedCacheManager> getCacheManager() const { return cache_manager_; }
 
-        // Connects the manager to an entity-component-system registry.
         void connectToRegistry(entt::registry& registry);
         void disconnectFromRegistry();
 
-        // Calls the update method of the underlying audio engine.
-        // This should be called once per frame in the main game loop.
         void update();
 
+        T& getEngine() { return engine_; }
+
     private:
-        // Callback for when an AudioSourceComponent is removed from an entity.
         void onAudioSourceRemoved(entt::registry& registry, entt::entity entity);
 
-        // Event handlers for audio control.
         void handlePlayAudioEvent(const events::PlayAudioEvent& event);
         void handleAudioBusControlEvent(const events::AudioBusControlEvent& event);
         void handleVoiceControlEvent(const events::VoiceControlEvent& event);
 
-        // The audio engine instance, its type is determined at compile time.
         T engine_;
         std::shared_ptr<resources::UnifiedCacheManager> cache_manager_;
         platform::EventBus& event_bus_;
@@ -64,8 +50,14 @@ namespace cyanvne::audio
         entt::connection remove_connection_;
         std::vector<platform::Subscription> subscriptions_;
 
-        // Maps a string tag to a currently playing voice for easy control.
         std::map<std::string, VoiceHandle> tagged_voices_;
+
+        struct ActiveVoice {
+            resources::ResourceHandle<resources::SoLoudWavResource> resource;
+            VoiceHandle handle;
+        };
+
+        std::map<VoiceHandle, ActiveVoice> active_voices_;
     };
 
     template <AudioEngine T>
@@ -76,7 +68,6 @@ namespace cyanvne::audio
               cache_manager_(std::move(cache_manager)),
               event_bus_(event_bus)
     {
-        // Subscribe to all relevant audio events upon construction.
         subscriptions_.push_back(
                 event_bus_.subscribe<events::PlayAudioEvent>([this](const auto& e){ this->handlePlayAudioEvent(e); return false; })
         );
@@ -97,15 +88,39 @@ namespace cyanvne::audio
     template <AudioEngine T>
     void AudioManager<T>::update()
     {
-        // Directly call the engine's update method.
         engine_.update();
+
+        auto it = active_voices_.begin();
+        while (it != active_voices_.end())
+        {
+            if (!engine_.isValidVoiceHandle(it->first))
+            {
+                it = active_voices_.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+
+        auto tag_it = tagged_voices_.begin();
+        while (tag_it != tagged_voices_.end())
+        {
+            if (!engine_.isValidVoiceHandle(tag_it->second))
+            {
+                tag_it = tagged_voices_.erase(tag_it);
+            }
+            else
+            {
+                ++tag_it;
+            }
+        }
     }
 
     template <AudioEngine T>
     void AudioManager<T>::connectToRegistry(entt::registry& registry)
     {
         disconnectFromRegistry();
-        // Connect the onAudioSourceRemoved method to the registry's destruction signal for AudioSourceComponent.
         remove_connection_ = registry.on_destroy<runtime::AudioSourceComponent>().connect<&AudioManager<T>::onAudioSourceRemoved>(this);
     }
 
@@ -121,11 +136,11 @@ namespace cyanvne::audio
     template <AudioEngine T>
     void AudioManager<T>::onAudioSourceRemoved(entt::registry& registry, entt::entity entity)
     {
-        // When an audio source component is removed, stop its associated sound.
         auto& source = registry.get<runtime::AudioSourceComponent>(entity);
         if (source.voice_handle != 0)
         {
             engine_.stop(source.voice_handle);
+            active_voices_.erase(source.voice_handle);
         }
     }
 
@@ -136,9 +151,11 @@ namespace cyanvne::audio
         {
             auto sound_res = cache_manager_->get<resources::SoLoudWavResource>(event.resource_key);
             if (!sound_res)
+            {
+                core::GlobalLogger::getCoreLogger()->warn("AudioManager: Failed to load audio resource '{}'", event.resource_key);
                 return;
+            }
 
-            // Ensure the bus exists, creating it if necessary.
             auto bus_handle = engine_.getBus(event.bus_name);
             if (bus_handle == 0 && event.bus_name != "Main")
             {
@@ -157,18 +174,26 @@ namespace cyanvne::audio
                 handle = engine_.play(bus_handle, sound_res.get(), event.volume);
             }
 
-            if (event.tag.has_value() && handle != 0)
+            if (handle != 0)
             {
-                if (tagged_voices_.contains(event.tag.value()))
+                active_voices_.emplace(handle, ActiveVoice{ std::move(sound_res), handle });
+
+                if (event.tag.has_value())
                 {
-                    engine_.stop(tagged_voices_[event.tag.value()]);
+                    const std::string& tag = event.tag.value();
+                    if (tagged_voices_.contains(tag))
+                    {
+                        VoiceHandle old_handle = tagged_voices_[tag];
+                        engine_.stop(old_handle);
+                        active_voices_.erase(old_handle);
+                    }
+                    tagged_voices_[tag] = handle;
                 }
-                tagged_voices_[event.tag.value()] = handle;
             }
         }
         catch (const std::exception& e)
         {
-            core::GlobalLogger::getCoreLogger()->error("AudioManager: Failed to handle PlayAudioEvent for '{}': {}", event.resource_key, e.what());
+            core::GlobalLogger::getCoreLogger()->error("AudioManager: Exception processing PlayAudioEvent for '{}': {}", event.resource_key, e.what());
         }
     }
 
@@ -178,7 +203,6 @@ namespace cyanvne::audio
         auto bus_handle = engine_.getBus(event.bus_name);
         if (bus_handle == 0 && event.bus_name != "Master")
         {
-            core::GlobalLogger::getCoreLogger()->warn("AudioManager: Attempted to control non-existent bus '{}'", event.bus_name);
             return;
         }
 
@@ -208,23 +232,27 @@ namespace cyanvne::audio
         auto it = tagged_voices_.find(event.tag);
         if (it == tagged_voices_.end())
         {
-            core::GlobalLogger::getCoreLogger()->warn("AudioManager: Attempted to control a voice with non-existent tag '{}'", event.tag);
             return;
         }
 
         VoiceHandle handle = it->second;
-        bool remove_tag_after = false;
+
+        if (!engine_.isValidVoiceHandle(handle))
+        {
+            tagged_voices_.erase(it);
+            return;
+        }
 
         switch (event.action)
         {
             case events::VoiceControlEvent::Action::STOP:
                 engine_.stop(handle);
-                remove_tag_after = true;
+                active_voices_.erase(handle);
+                tagged_voices_.erase(it);
                 break;
             case events::VoiceControlEvent::Action::FADE_OUT_AND_STOP:
                 engine_.fadeVolume(handle, 0.0f, event.value2);
                 engine_.scheduleStop(handle, event.value2);
-                remove_tag_after = true;
                 break;
             case events::VoiceControlEvent::Action::SET_VOLUME:
                 engine_.setVolume(handle, event.value1);
@@ -238,11 +266,6 @@ namespace cyanvne::audio
             case events::VoiceControlEvent::Action::SEEK:
                 engine_.seek(handle, event.value1);
                 break;
-        }
-
-        if (remove_tag_after)
-        {
-            tagged_voices_.erase(it);
         }
     }
 }
