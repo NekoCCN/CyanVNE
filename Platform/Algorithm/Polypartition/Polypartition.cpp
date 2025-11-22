@@ -4,7 +4,7 @@
 
 
 #include "Polypartition.h"
-#include "src/Polypartition.h"
+#include "src/polypartition.h"
 
 #include "Core/Logger/Logger.h"
 #include "Platform/Algorithm/ContourTracing/ContourTracing.h"

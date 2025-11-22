@@ -231,6 +231,7 @@ namespace cyanvne::platform::concurrency
         auto submit_worker(F &&task) -> std::future<decltype(task())>
         {
             using ReturnType = decltype(task());
+
             auto promise = std::make_shared<std::promise<ReturnType>>();
             auto future = promise->get_future();
 
