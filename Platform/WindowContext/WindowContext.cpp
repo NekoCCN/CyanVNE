@@ -81,7 +81,9 @@ WindowContext::WindowContext(
         throw cyanvne::exception::platformexception::CreateWindowContextException("Failed to create window");
     }
 
-    if (s_window_count_.fetch_add(1) == 0)
+    bool is_main_window = (s_window_count_.fetch_add(1) == 0);
+
+    if (is_main_window)
     {
         cyanvne::core::GlobalLogger::getCoreLogger()->info("First window created. Initializing BGFX using this window...");
 
@@ -114,21 +116,24 @@ WindowContext::WindowContext(
             cyanvne::core::GlobalLogger::getCoreLogger()->critical("Failed to initialize BGFX");
             throw cyanvne::exception::platformexception::CreateWindowContextException("Failed to initialize BGFX");
         }
+
+        frame_buffer_handle_ = BGFX_INVALID_HANDLE;
     }
-
-    void* native_handle = getNativeWindowHandle();
-    frame_buffer_handle_ = bgfx::createFrameBuffer(native_handle, width_, height_);
-    if (!bgfx::isValid(frame_buffer_handle_))
+    else
     {
-        if (s_window_count_.fetch_sub(1) == 1)
-        {
-            bgfx::shutdown();
-        }
-        SDL_DestroyWindow(window_);
-        window_ = nullptr;
+        void* native_handle = getNativeWindowHandle();
+        frame_buffer_handle_ = bgfx::createFrameBuffer(native_handle, width_, height_);
 
-        cyanvne::core::GlobalLogger::getCoreLogger()->critical("Failed to create frame buffer for window: {}", title);
-        throw cyanvne::exception::platformexception::CreateWindowContextException("Failed to create frame buffer");
+        if (!bgfx::isValid(frame_buffer_handle_))
+        {
+            SDL_DestroyWindow(window_);
+            window_ = nullptr;
+
+            s_window_count_--;
+
+            cyanvne::core::GlobalLogger::getCoreLogger()->critical("Failed to create frame buffer for secondary window: {}", title);
+            throw cyanvne::exception::platformexception::CreateWindowContextException("Failed to create frame buffer");
+        }
     }
 
     renderer_type_ = bgfx::getCaps()->rendererType;
@@ -184,21 +189,23 @@ void WindowContext::reset(uint32_t width, uint32_t height)
     width_ = width;
     height_ = height;
 
-    bgfx::reset(width_, height_, s_options_mask_);
-
-    if (bgfx::isValid(frame_buffer_handle_))
+    if (!bgfx::isValid(frame_buffer_handle_))
+    {
+        bgfx::reset(width_, height_, s_options_mask_);
+    }
+    else
     {
         bgfx::destroy(frame_buffer_handle_);
-    }
 
-    void* native_handle = getNativeWindowHandle();
-    if (native_handle == nullptr)
-    {
-        cyanvne::core::GlobalLogger::getCoreLogger()->error("Failed to get native handle on reset");
-        return;
-    }
+        void* native_handle = getNativeWindowHandle();
+        if (native_handle == nullptr)
+        {
+            cyanvne::core::GlobalLogger::getCoreLogger()->error("Failed to get native handle on reset");
+            return;
+        }
 
-    frame_buffer_handle_ = bgfx::createFrameBuffer(native_handle, width_, height_);
+        frame_buffer_handle_ = bgfx::createFrameBuffer(native_handle, width_, height_);
+    }
 }
 
 SDL_Window* WindowContext::getWindowHandle() const
@@ -239,7 +246,6 @@ void WindowContext::setWindowPosition(int32_t x, int32_t y)
 void WindowContext::setWindowSize(int32_t width, int32_t height)
 {
     SDL_SetWindowSize(window_, width, height);
-
     reset(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 }
 
