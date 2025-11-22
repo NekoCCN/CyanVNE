@@ -23,18 +23,6 @@ namespace cyanvne
             return data.size();
         }
 
-        bgfx::TextureFormat::Enum toBgfxFormat(SDL_PixelFormat sdl_format)
-        {
-            switch (sdl_format)
-            {
-                case SDL_PIXELFORMAT_RGBA8888: return bgfx::TextureFormat::RGBA8;
-                case SDL_PIXELFORMAT_BGRA8888: return bgfx::TextureFormat::BGRA8;
-                case SDL_PIXELFORMAT_XRGB8888:   return bgfx::TextureFormat::RGB8;
-                case SDL_PIXELFORMAT_RGB24:    return bgfx::TextureFormat::RGB8;
-                default:                       return bgfx::TextureFormat::Unknown;
-            }
-        }
-
         TextureResource::TextureResource(const std::vector<uint8_t>& raw_data, ImageLoader loader)
         {
             if (raw_data.empty())
@@ -75,6 +63,7 @@ namespace cyanvne
             }
             else
             {
+                // EXTENDED (SDL_Image) 加载路径 - 关键修复
                 SDL_IOStream* stream = SDL_IOFromConstMem(raw_data.data(), static_cast<int>(raw_data.size()));
                 if (!stream)
                 {
@@ -88,23 +77,21 @@ namespace cyanvne
                             "SDL_image failed to load image: " + std::string(SDL_GetError()));
                 }
 
-                bgfx::TextureFormat::Enum format = toBgfxFormat(surface->format);
-                if (format == bgfx::TextureFormat::Unknown)
-                {
-                    SDL_Surface* converted_surface = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA8888);
-                    SDL_DestroySurface(surface);
-                    if (!converted_surface)
-                    {
-                        throw exception::resourcesexception::ResourceManagerIOException("Failed to convert surface to RGBA8888.");
-                    }
-                    surface = converted_surface;
-                    format = bgfx::TextureFormat::RGBA8;
-                }
+                SDL_Surface* converted_surface = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_ABGR8888);
+                SDL_DestroySurface(surface);
 
-                const bgfx::Memory* mem = bgfx::copy(surface->pixels, surface->w * surface->h * SDL_BYTESPERPIXEL(surface->format));
+                if (!converted_surface)
+                {
+                    throw exception::resourcesexception::ResourceManagerIOException("Failed to convert surface to ABGR8888.");
+                }
+                surface = converted_surface;
+
+                const bgfx::Memory* mem = bgfx::copy(surface->pixels, surface->w * surface->h * 4);
+
                 texture_handle = bgfx::createTexture2D(
                         static_cast<uint16_t>(surface->w), static_cast<uint16_t>(surface->h),
-                        false, 1, format, BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem
+                        false, 1, bgfx::TextureFormat::RGBA8,
+                        BGFX_TEXTURE_NONE | BGFX_SAMPLER_NONE, mem
                 );
 
                 texture_size_bytes_ = mem->size;
@@ -133,16 +120,16 @@ namespace cyanvne
         SoLoudWavResource::SoLoudWavResource(const std::vector<uint8_t>& raw_data)
         {
             SoLoud::result res = sound.loadMem(
-                const_cast<unsigned char*>(raw_data.data()),
-                static_cast<unsigned int>(raw_data.size()),
-                false,
-                false
+                    const_cast<unsigned char*>(raw_data.data()),
+                    static_cast<unsigned int>(raw_data.size()),
+                    false,
+                    false
             );
 
             if (res != SoLoud::SO_NO_ERROR)
             {
                 throw exception::resourcesexception::ResourceManagerIOException(
-                    "Failed to load SoLoud Wav from memory.");
+                        "Failed to load SoLoud Wav from memory.");
             }
             decoded_size_bytes_ = static_cast<size_t>(sound.mSampleCount) * sizeof(float) * sound.mChannels;
         }

@@ -8,7 +8,11 @@
 
 namespace cyanvne::ecs::systems
 {
+    void TransformSystem(entt::registry& registry);
+
+    void RenderSystem(entt::registry& registry, runtime::MeshBatchRenderer& renderer);
+
     void ResourceLoadingSystem(entt::registry& registry,
-                               resources::UnifiedCacheManager& cache_manager,
+                               const std::shared_ptr<resources::UnifiedCacheManager>& cache_manager,
                                platform::concurrency::UnifiedConcurrencyManager& concurrency_manager);
 }
