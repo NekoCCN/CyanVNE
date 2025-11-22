@@ -12,12 +12,15 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Audio/IAudioEngine/IAudioEngine.h"
 #include "Runtime/Renderer/MeshBatchRenderer/MeshBatchRenderer.h"
+#include "Core/ViewID/ViewID.h"
 #include <variant>
 
 namespace cyanvne::runtime
 {
     struct MeshComponent
     {
+        uint32_t layer_mask = 1;
+
         std::vector<MeshBatchRenderer::PosTexColorVertex> vertices;
         std::vector<uint32_t> indices;
     };
@@ -71,6 +74,41 @@ namespace cyanvne::runtime
         int current_frame = 0;
         bool is_playing = true;
         bool loop = true;
+    };
+
+    struct TransformComponent
+    {
+        glm::vec2 position = { 0.0f, 0.0f };
+        glm::vec2 scale = { 1.0f, 1.0f };
+        float rotation = 0.0f;
+    };
+
+    struct HierarchyComponent
+    {
+        entt::entity parent = entt::null;
+        entt::entity first_child = entt::null;
+        entt::entity prev_sibling = entt::null;
+        entt::entity next_sibling = entt::null;
+    };
+
+    struct WorldTransformComponent
+    {
+        glm::mat4 transform{1.0f};
+    };
+
+    struct CameraComponent
+    {
+        core::RenderLayer render_layer = core::RenderLayer::World3D;
+
+        glm::mat4 view_matrix{1.0f};
+
+        glm::mat4 projection_matrix{1.0f};
+
+        std::weak_ptr<platform::WindowContext> target_window;
+
+        glm::vec4 viewport_rect = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+        uint32_t culling_mask = 0xFFFFFFFF;
     };
 
     struct AudioSourceComponent
