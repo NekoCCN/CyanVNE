@@ -1,14 +1,13 @@
-﻿
-set(CyanVNERuntime_SRC
-  "GameStateManager/GameStateManager.h"
-  "GameStateManager/GameStateManager.cpp"
-  "EcsGameState/EcsGameState.h"
-  "RuntimeUtils/RuntimeUtils.h"
-  "RuntimeUtils/RuntimeUtils.cpp"
-  "Components/Components.h"
-  "Systems/Systems.h"
-  "Systems/Systems.cpp"
- "EcsGameState/EcsGameState.cpp"
+﻿set(CyanVNERuntime_SRC
+        "GameStateManager/GameStateManager.h"
+        "GameStateManager/GameStateManager.cpp"
+        "EcsGameState/EcsGameState.h"
+        "RuntimeUtils/RuntimeUtils.h"
+        "RuntimeUtils/RuntimeUtils.cpp"
+        "Components/Components.h"
+        "Systems/Systems.h"
+        "Systems/Systems.cpp"
+        "EcsGameState/EcsGameState.cpp"
         "RuntimeException/RuntimeException.h"
         Renderer/MeshBatchRenderer/MeshBatchRenderer.cpp
         Renderer/MeshBatchRenderer/MeshBatchRenderer.h
@@ -17,11 +16,10 @@ set(CyanVNERuntime_SRC
 add_library(CyanVNERuntime STATIC ${CyanVNERuntime_SRC})
 
 set(CyanVNERuntime_Require
-  CyanVNECore
-  CyanVNEPlatform
-    CyanVNEAudio
-  lua_library_static
-  EnTT::EnTT
+        CyanVNECore
+        CyanVNEPlatform
+        CyanVNEAudio
+        EnTT::EnTT
         glm::glm
         CyanVNEShaders
 )

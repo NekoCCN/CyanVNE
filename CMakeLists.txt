@@ -17,9 +17,6 @@ endif()
 add_subdirectory( "External/boost" )
 include_directories( "External/boost/fiber/examples" )
 
-# Sol2
-add_subdirectory( "External/sol2" )
-
 # EnTT
 add_subdirectory( "External/entt" )
 
